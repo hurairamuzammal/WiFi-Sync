@@ -1,0 +1,11 @@
+{
+  "backend_type": "firebase",
+  "firebase_rtdb_url": "https://<your-project-id>-default-rtdb.firebaseio.com",
+  "user_id": "<your-firebase-user-uid>",
+  "device_id": "thinkpad_linux_01",
+  "display_name": "ThinkPad Linux",
+  "clipboard_sync_enabled": true,
+  "firebase_id_token": "<your-firebase-id-token>",
+  "firebase_refresh_token": "<your-firebase-refresh-token>",
+  "firebase_api_key": "<your-firebase-web-api-key>"
+}

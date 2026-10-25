@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: always
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-change-this-in-production-with-random-secret}
+      - DATABASE_PATH=/data/world_of_it.db
+      - TOKEN_EXPIRE_MINUTES=1440
+      - HEARTBEAT_TIMEOUT_SECONDS=45
+    volumes:
+      - backend-data:/data
+    networks:
+      - iot-network
+
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - backend
+    networks:
+      - iot-network
+
+volumes:
+  backend-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  iot-network:
+    driver: bridge

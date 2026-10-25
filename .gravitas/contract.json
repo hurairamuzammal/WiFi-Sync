@@ -1,0 +1,37 @@
+{
+  "mode": "implement",
+  "objective": "Transition World of IT to Firebase architecture per updated plan/world_of_it_project_pack/docs: Firebase Auth, Firebase Realtime Database with Security Rules, Python Linux desktop agent with RTDB streaming/polling, and Flutter client app with live stream listeners",
+  "acceptance_criteria": [
+    "AC-01: Firebase CLI installed and configured with .firebaserc and firebase.json targeting world-of-it-app",
+    "AC-02: Firebase Security Rules (database.rules.json) enforce deny-by-default and strict user UID isolation matching DATA_MODEL.md",
+    "AC-03: Flutter application integrates firebase_core, firebase_auth, and firebase_database with multi-platform FirebaseOptions and live Realtime Database streams",
+    "AC-04: Linux desktop agent supports Firebase Realtime Database REST/SSE events, heartbeats, allowlisted actions (shutdown, restart, sleep, health_check), and loop-free clipboard synchronization",
+    "AC-05: Local emulator configuration (Auth 9099, Database 9000, UI 4000) enables zero-cloud cost and offline test execution",
+    "AC-06: Complete verification suite passes with 12 Python tests and 6 Flutter tests with VERDICT: PASS"
+  ],
+  "non_goals": [
+    "Oracle VM deployment (explicitly excluded by updated architecture)",
+    "Custom WebSocket server mandatory requirement (replaced by hosted Firebase Realtime Database)",
+    "Plaintext passwords, tokens, or clipboard text stored in logs or rules"
+  ],
+  "risk": "medium",
+  "budget": "deep",
+  "planning": "deep",
+  "context_depth": "dependency",
+  "verification_depth": "impact",
+  "delegation": "none",
+  "allowed_write_scope": [
+    "firebase.json",
+    ".firebaserc",
+    "database.rules.json",
+    "lib/",
+    "agent/",
+    "assets/",
+    "android/",
+    "linux/",
+    "test/",
+    "tests/",
+    ".gravitas/",
+    "pubspec.yaml"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "firebase": {
+      "command": "/home/user/.nvm/versions/node/v22.23.2/bin/npx",
+      "args": [
+        "-y",
+        "firebase-tools@latest",
+        "mcp",
+        "--only",
+        "core,database,auth"
+      ],
+      "env": {
+        "PATH": "/home/user/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin"
+      }
+    },
+    "github": {
+      "command": "bash",
+      "args": [
+        "/home/user/Extras/Flutter-Projects-Backup/working/world_of_iot/.agents/plugins/world-of-iot-kit/run-github-mcp.sh"
+      ]
+    }
+  }
+}

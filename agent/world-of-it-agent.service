@@ -1,0 +1,20 @@
+[Unit]
+Description=World of IT Linux Desktop Agent
+After=network.target
+
+[Service]
+Type=simple
+User=%I
+WorkingDirectory=/opt/world-of-it-agent
+ExecStart=/opt/world-of-it-agent/venv/bin/python3 /opt/world-of-it-agent/agent.py --config /etc/world-of-it/device_config.json --server https://api.yourdomain.com
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+ProtectSystem=full
+NoNewPrivileges=false
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=World of IT Seamless Clipboard & Command Sync Agent
+After=network-online.target graphical-session.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/user/Extras/Flutter-Projects-Backup/working/world_of_iot
+ExecStart=/home/user/Extras/Flutter-Projects-Backup/working/world_of_iot/.venv/bin/python3 /home/user/Extras/Flutter-Projects-Backup/working/world_of_iot/agent/agent.py --config /home/user/Extras/Flutter-Projects-Backup/working/world_of_iot/device_config.json
+Restart=always
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,73 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid",
+        "profile": {
+          ".validate": "newData.hasChildren(['createdAt'])"
+        },
+        "devices": {
+          "$deviceId": {
+            ".validate": "newData.hasChildren(['displayName', 'platform'])",
+            "displayName": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+            },
+            "platform": {
+              ".validate": "newData.val() == 'linux' || newData.val() == 'windows' || newData.val() == 'macos' || newData.val() == 'android' || newData.val() == 'ios'"
+            },
+            "trusted": {
+              ".validate": "newData.isBoolean()"
+            },
+            "revoked": {
+              ".validate": "newData.isBoolean()"
+            },
+            "clipboardSyncEnabled": {
+              ".validate": "newData.isBoolean()"
+            },
+            "lastSeenAt": {
+              ".validate": "newData.isNumber()"
+            }
+          }
+        },
+        "pairingRequests": {
+          "$pairingId": {
+            ".validate": "newData.hasChildren(['status', 'createdAt', 'expiresAt'])",
+            "status": {
+              ".validate": "newData.val() == 'pending' || newData.val() == 'approved' || newData.val() == 'rejected' || newData.val() == 'expired' || newData.val() == 'claimed'"
+            }
+          }
+        },
+        "clipboardEvents": {
+          "$eventId": {
+            ".validate": "newData.hasChildren(['sourceDeviceId', 'text', 'createdAt'])",
+            "sourceDeviceId": {
+              ".validate": "newData.isString()"
+            },
+            "text": {
+              ".validate": "newData.isString() && newData.val().length <= 100000"
+            }
+          }
+        },
+        "commands": {
+          "$commandId": {
+            ".validate": "newData.hasChildren(['targetDeviceId', 'action', 'status', 'createdAt', 'expiresAt'])",
+            "action": {
+              ".validate": "newData.val() == 'shutdown' || newData.val() == 'restart' || newData.val() == 'sleep' || newData.val() == 'health_check'"
+            },
+            "status": {
+              ".validate": "newData.val() == 'pending' || newData.val() == 'sent' || newData.val() == 'accepted' || newData.val() == 'succeeded' || newData.val() == 'failed' || newData.val() == 'expired' || newData.val() == 'unconfirmed'"
+            }
+          }
+        },
+        "auditEvents": {
+          "$eventId": {
+            ".validate": "newData.hasChildren(['eventType', 'createdAt'])"
+          }
+        }
+      }
+    }
+  }
+}
