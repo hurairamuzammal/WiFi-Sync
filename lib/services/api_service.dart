@@ -132,14 +132,22 @@ class ApiService {
     return session;
   }
 
-  Future<AuthSession> signInWithGoogle() async {
-    final session = await FirebaseService().signInWithGoogle();
+  Future<AuthSession> signInWithGoogle({bool isSignUp = false}) async {
+    final session = await FirebaseService().signInWithGoogle(isSignUp: isSignUp);
     await _saveSession(session);
     return session;
   }
 
+  Future<AuthSession> signUpWithGoogle() =>
+      signInWithGoogle(isSignUp: true);
+
   Future<void> sendPasswordResetEmail(String email) async {
     await FirebaseService().sendPasswordResetEmail(email);
+  }
+
+  /// Clears local saved session, tokens, and disconnects clipboard sync (Forget Me / Forget Session).
+  Future<void> forgetDeviceSession() async {
+    await logOut();
   }
 
   bool get isEmailPasswordAccount => FirebaseService().isEmailPasswordAccount;

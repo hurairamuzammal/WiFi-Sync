@@ -190,10 +190,10 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   Future<void> _handleRevoke() async {
     final confirmed = await ConfirmationDialog.show(
       context,
-      title: 'Remove Device',
+      title: 'Forget Device',
       message:
-          'Remove "${_device.displayName}" from your synced devices?',
-      confirmLabel: 'Remove',
+          'Forget and remove "${_device.displayName}" from your synced devices?',
+      confirmLabel: 'Forget Device',
       confirmColor: const Color(0xFFD95C63),
       icon: Icons.delete_outline_rounded,
     );
@@ -293,7 +293,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
             },
             itemBuilder: (_) => const [
               PopupMenuItem(value: 'rename', child: Text('Rename')),
-              PopupMenuItem(value: 'revoke', child: Text('Remove device')),
+              PopupMenuItem(value: 'revoke', child: Text('Forget / Remove device')),
             ],
           ),
           const SizedBox(width: 6),

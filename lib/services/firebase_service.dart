@@ -356,7 +356,7 @@ class FirebaseService {
     );
   }
 
-  Future<app_models.AuthSession> signInWithGoogle() async {
+  Future<app_models.AuthSession> signInWithGoogle({bool isSignUp = false}) async {
     if (!_initialized) await init();
 
     if (_useRestClient) {
@@ -385,7 +385,8 @@ class FirebaseService {
       'lastLoginAt': ServerValue.timestamp,
     });
 
-    await recordAuditEvent('user_google_login', metadata: {'email': user.email});
+    final eventType = isSignUp ? 'user_google_signup' : 'user_google_login';
+    await recordAuditEvent(eventType, metadata: {'email': user.email});
 
     return app_models.AuthSession(
       accessToken: await user.getIdToken() ?? 'session-token',
@@ -394,6 +395,9 @@ class FirebaseService {
       email: user.email ?? '',
     );
   }
+
+  Future<app_models.AuthSession> signUpWithGoogle() =>
+      signInWithGoogle(isSignUp: true);
 
   /// Sends a password reset email ONLY for Email/Password accounts.
   /// Rejects accounts that are registered exclusively with Google OAuth.

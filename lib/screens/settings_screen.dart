@@ -3,6 +3,8 @@ import '../services/api_service.dart';
 import '../services/clipboard_sync_manager.dart';
 import '../services/firebase_service.dart';
 import '../widgets/brand_logo_icon.dart';
+import '../widgets/google_logo_icon.dart';
+import '../widgets/confirmation_dialog.dart';
 import 'auth_screen.dart';
 import 'developer_screen.dart';
 
@@ -75,6 +77,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _handleLogout() async {
     ClipboardSyncManager().stop();
     await ApiService().logOut();
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+        (route) => false,
+      );
+    }
+  }
+
+  Future<void> _handleForgetDeviceSession() async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Forget Device Session',
+      message:
+          'Clear all locally saved credentials, tokens, and disconnect clipboard sync on this device?',
+      confirmLabel: 'Forget & Sign Out',
+      confirmColor: const Color(0xFFD95C63),
+      icon: Icons.phonelink_erase_rounded,
+    );
+    if (!confirmed) return;
+
+    ClipboardSyncManager().stop();
+    await ApiService().forgetDeviceSession();
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const AuthScreen()),
@@ -264,6 +288,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(
                               fontSize: 13.5, fontWeight: FontWeight.w500),
                         ),
+                        subtitle: const Text(
+                          'Send password reset email link',
+                          style: TextStyle(fontSize: 11.5),
+                        ),
                         trailing: TextButton(
                           onPressed: _handleResetPassword,
                           child: const Text(
@@ -272,7 +300,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                       ),
+                    ] else ...[
+                      const Divider(),
+                      ListTile(
+                        dense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 2),
+                        leading: const GoogleLogoIcon(size: 19),
+                        title: const Text(
+                          'Google Account Security',
+                          style: TextStyle(
+                              fontSize: 13.5, fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: const Text(
+                          'Password and authentication managed by Google OAuth',
+                          style: TextStyle(fontSize: 11.5),
+                        ),
+                      ),
                     ],
+                    const Divider(),
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      leading: Icon(
+                        Icons.phonelink_erase_rounded,
+                        size: 20,
+                        color: theme.colorScheme.error,
+                      ),
+                      title: Text(
+                        'Forget this device session',
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w500,
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                      subtitle: const Text(
+                        'Clear local credentials, tokens, and active clipboard sync',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      trailing: TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: theme.colorScheme.error,
+                        ),
+                        onPressed: _handleForgetDeviceSession,
+                        child: const Text(
+                          'Forget',
+                          style: TextStyle(fontSize: 12.5),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

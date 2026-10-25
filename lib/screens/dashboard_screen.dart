@@ -265,7 +265,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: ListView.separated(
                           shrinkWrap: true,
                           itemCount: history.length,
-                          separatorBuilder: (_, __) => const Divider(),
+                          separatorBuilder: (_, _) => const Divider(),
                           itemBuilder: (_, idx) {
                             final item = history[idx];
                             return ListTile(

@@ -133,7 +133,7 @@ class _CommandHistoryScreenState extends State<CommandHistoryScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 12),
                             itemCount: _commands.length,
-                            separatorBuilder: (_, __) =>
+                            separatorBuilder: (_, _) =>
                                 const SizedBox(height: 10),
                             itemBuilder: (ctx, index) {
                               final cmd = _commands[index];
