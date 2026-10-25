@@ -13,4 +13,5 @@
   - [x] **Forgot Password (Email Accounts Only)**: Added password reset email flow (`sendPasswordResetEmail`) in `AuthScreen` and `SettingsScreen`, strictly restricted to Email & Password accounts (blocked for Google OAuth accounts).
   - [x] **Developer & Version Page (`v2.1.0`)**: Added `DeveloperScreen` featuring **Muhammad Abu Huraira** (`huraira.eqeel@gmail.com`) and colorful purplish brand/launcher icons.
   - [x] **Seamless V2 Auto-Sync & Linux Top Bar**: Added 1s auto-clipboard sync, Samsung floating pill toast + alert sound, unread top-right badge, Linux top bar indicator (`pystray`), and systemd autostart (`world-of-iot-agent.service`).
+  - [x] **Private GitHub Repository**: Initialized standalone git repository at `hurairamuzammal/world_of_iot`, secured with sanitized `.gitignore` and `device_config.example.json`, and published to GitHub as a private repository.
 
