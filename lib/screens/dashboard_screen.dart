@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/device.dart';
 import '../services/api_service.dart';
+import '../services/background_sync_service.dart';
 import '../services/clipboard_sync_manager.dart';
 import '../services/firebase_service.dart';
 import '../widgets/brand_logo_icon.dart';
@@ -27,11 +29,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Timer? _pollingTimer;
   StreamSubscription<List<Device>>? _deviceSub;
   final ClipboardSyncManager _syncManager = ClipboardSyncManager();
+  bool _accessibilityBannerDismissed = false;
+  bool _accessibilityNeeded = false;
 
   @override
   void initState() {
     super.initState();
     _fetchDevices();
+
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      _checkAccessibilityStatus();
+    }
 
     _syncManager.addListener(_onSyncStateChanged);
     _syncManager.onRemoteClipReceived = (item) {
@@ -65,6 +73,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _onSyncStateChanged() {
     if (mounted) setState(() {});
+  }
+
+  Future<void> _checkAccessibilityStatus() async {
+    final enabled = await BackgroundSyncService().isAccessibilityEnabled();
+    if (mounted) {
+      setState(() {
+        _accessibilityNeeded = !enabled;
+      });
+    }
   }
 
   @override
@@ -450,6 +467,87 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         padding:
                             const EdgeInsets.fromLTRB(20, 12, 20, 96),
                         children: [
+                          // Android Accessibility Setup Banner
+                          if (_accessibilityNeeded && !_accessibilityBannerDismissed) ...[
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF322718)
+                                    : const Color(0xFFFFF9E6),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(0xFF6E5322)
+                                      : const Color(0xFFFFD591),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.accessibility_new_rounded,
+                                    size: 20,
+                                    color: Color(0xFFD46B08),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Background sync needs Accessibility',
+                                          style: TextStyle(
+                                            fontSize: 12.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          'Required on Android 10+ to detect copied text across apps.',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: theme
+                                                .colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                    ),
+                                    onPressed: () async {
+                                      await BackgroundSyncService()
+                                          .openAccessibilitySettings();
+                                      await Future.delayed(
+                                          const Duration(seconds: 1));
+                                      _checkAccessibilityStatus();
+                                    },
+                                    child: const Text('Enable',
+                                        style: TextStyle(fontSize: 12)),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close, size: 16),
+                                    visualDensity: VisualDensity.compact,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () {
+                                      setState(() {
+                                        _accessibilityBannerDismissed = true;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+
                           // Minimal Flat Pastel Sync Strip
                           Container(
                             padding: const EdgeInsets.all(16),

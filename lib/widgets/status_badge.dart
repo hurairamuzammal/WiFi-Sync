@@ -17,6 +17,8 @@ class StatusBadge extends StatelessWidget {
     switch (s) {
       case 'online':
       case 'succeeded':
+      case 'active':
+      case 'optimized':
         bgColor = isDark ? const Color(0xFF21382E) : const Color(0xFFE5F5ED);
         fgColor = isDark ? const Color(0xFFA6E1C8) : const Color(0xFF2A664B);
         dotColor = const Color(0xFF34C77B);

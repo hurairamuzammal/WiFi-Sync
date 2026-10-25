@@ -400,17 +400,72 @@ class FirebaseService {
       signInWithGoogle(isSignUp: true);
 
   /// Sends a password reset email ONLY for Email/Password accounts.
-  /// Rejects accounts that are registered exclusively with Google OAuth.
+  /// Hardened with multi-tier rate limiting (per-email cooldown, sliding window, and device limits)
+  /// to protect against brute-force, email flooding, and quota exhaustion attacks.
   Future<void> sendPasswordResetEmail(String email) async {
     if (!_initialized) await init();
-    final cleanEmail = email.trim();
+    final cleanEmail = email.trim().toLowerCase();
     if (cleanEmail.isEmpty) {
       throw Exception('Please enter your email address first.');
     }
 
+    // Input Validation: RFC 5322 compliant regex and length bounds
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$',
+    );
+    if (!emailRegex.hasMatch(cleanEmail) || cleanEmail.length > 120) {
+      throw Exception('Please enter a valid email address.');
+    }
+
+    // ---------------- Security Rate Limiter (Email & Device Limits) ----------------
+    final prefs = await SharedPreferences.getInstance();
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+
+    // Tier 1: Strict 60-second cooldown between consecutive reset requests for the same email
+    final lastResetKey = 'rate_limit_reset_$cleanEmail';
+    final lastResetMs = prefs.getInt(lastResetKey) ?? 0;
+    const cooldownSeconds = 60;
+    if (nowMs - lastResetMs < cooldownSeconds * 1000) {
+      final waitSec =
+          ((cooldownSeconds * 1000 - (nowMs - lastResetMs)) / 1000).ceil();
+      throw Exception(
+        'Security cooldown active: Please wait $waitSec seconds before requesting another reset email.',
+      );
+    }
+
+    // Tier 2: Sliding Window Limit: Maximum 3 requests per 15 minutes for the same email
+    final emailWindowKey = 'rate_limit_window_$cleanEmail';
+    final emailWindowRaw = prefs.getStringList(emailWindowKey) ?? [];
+    final fifteenMinsAgo = nowMs - (15 * 60 * 1000);
+    final recentEmailAttempts = emailWindowRaw
+        .map((s) => int.tryParse(s) ?? 0)
+        .where((ts) => ts > fifteenMinsAgo)
+        .toList();
+
+    if (recentEmailAttempts.length >= 3) {
+      throw Exception(
+        'Rate limit reached: Maximum 3 password reset attempts per 15 minutes for this email. Please try again later to protect account security.',
+      );
+    }
+
+    // Tier 3: Device-wide Limit: Maximum 6 requests across all emails per hour (anti-enumeration)
+    const deviceWindowKey = 'rate_limit_device_resets';
+    final deviceWindowRaw = prefs.getStringList(deviceWindowKey) ?? [];
+    final oneHourAgo = nowMs - (60 * 60 * 1000);
+    final recentDeviceAttempts = deviceWindowRaw
+        .map((s) => int.tryParse(s) ?? 0)
+        .where((ts) => ts > oneHourAgo)
+        .toList();
+
+    if (recentDeviceAttempts.length >= 6) {
+      throw Exception(
+        'Security limit reached: Too many password reset requests from this device. Please wait 1 hour before attempting again.',
+      );
+    }
+
     // If the user is currently logged in with this email via Google only, block password reset
     if (isAuthenticated &&
-        currentUserEmail?.toLowerCase() == cleanEmail.toLowerCase() &&
+        currentUserEmail?.toLowerCase() == cleanEmail &&
         !isEmailPasswordAccount) {
       throw Exception(
         'This account uses Google Sign-In. Password reset is only available for email/password accounts.',
@@ -460,10 +515,25 @@ class FirebaseService {
             (body['error'] as Map?)?['message'] ?? 'Password reset failed';
         throw Exception(msg);
       }
-      return;
+    } else {
+      await _auth!.sendPasswordResetEmail(email: cleanEmail);
     }
 
-    await _auth!.sendPasswordResetEmail(email: cleanEmail);
+    // On successful dispatch, commit timestamps to persistent rate limit storage
+    recentEmailAttempts.add(nowMs);
+    await prefs.setInt(lastResetKey, nowMs);
+    await prefs.setStringList(
+      emailWindowKey,
+      recentEmailAttempts.map((ts) => ts.toString()).toList(),
+    );
+
+    recentDeviceAttempts.add(nowMs);
+    await prefs.setStringList(
+      deviceWindowKey,
+      recentDeviceAttempts.map((ts) => ts.toString()).toList(),
+    );
+
+    await recordAuditEvent('password_reset_sent', metadata: {'email': cleanEmail});
   }
 
   Future<void> logOut() async {

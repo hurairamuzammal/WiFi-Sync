@@ -115,3 +115,56 @@ def generate_pairing_code() -> str:
     # Exclude easily confused characters like O, 0, I, 1
     alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
     return "".join(secrets.choice(alphabet) for _ in range(6))
+
+
+class SlidingWindowRateLimiter:
+    """
+    In-memory rate limiter mitigating brute-force and spam on auth / password reset endpoints.
+    Enforces per-IP and per-email sliding windows and cooldown intervals.
+    """
+
+    def __init__(self):
+        self._ip_history: Dict[str, list[float]] = {}
+        self._email_history: Dict[str, list[float]] = {}
+        self._cooldowns: Dict[str, float] = {}
+
+    def check_and_record(
+        self,
+        ip: str,
+        email: str,
+        max_per_ip: int = 5,
+        max_per_email: int = 3,
+        window_seconds: int = 900,  # 15 minutes
+        cooldown_seconds: int = 60,
+    ) -> tuple[bool, Optional[str]]:
+        now = time.time()
+        email_clean = email.lower().strip()
+
+        # 1. Cooldown check per email
+        last_req = self._cooldowns.get(email_clean, 0.0)
+        if now - last_req < cooldown_seconds:
+            wait = int(cooldown_seconds - (now - last_req))
+            return False, f"Please wait {wait} seconds before requesting another password reset email."
+
+        # 2. Check sliding window for email
+        cutoff = now - window_seconds
+        email_timestamps = [t for t in self._email_history.get(email_clean, []) if t > cutoff]
+        if len(email_timestamps) >= max_per_email:
+            return False, "Too many password reset requests for this email. Please try again after 15 minutes."
+
+        # 3. Check sliding window for IP
+        ip_timestamps = [t for t in self._ip_history.get(ip, []) if t > cutoff]
+        if len(ip_timestamps) >= max_per_ip:
+            return False, "Too many requests from this IP address. Please try again after 15 minutes."
+
+        # Record attempt
+        email_timestamps.append(now)
+        self._email_history[email_clean] = email_timestamps
+        ip_timestamps.append(now)
+        self._ip_history[ip] = ip_timestamps
+        self._cooldowns[email_clean] = now
+        return True, None
+
+
+rate_limiter = SlidingWindowRateLimiter()
+

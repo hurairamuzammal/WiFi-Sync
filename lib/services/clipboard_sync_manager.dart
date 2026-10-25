@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/device.dart';
 import 'api_service.dart';
+import 'background_sync_service.dart';
 import 'firebase_service.dart';
 
 class ClipboardSyncItem {
@@ -124,6 +125,17 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
         _handleIncomingRemoteClipboard(evt);
       });
     }
+
+    // 5. Initialize Android Accessibility Service & Foreground Keep-Alive bridge
+    BackgroundSyncService().init();
+    BackgroundSyncService().onExternalClipboardReceived = (text) {
+      if (_running && _autoSyncEnabled) {
+        _handleDirectLocalClipboardPush(text);
+      }
+    };
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      BackgroundSyncService().startForegroundSync();
+    }
   }
 
   void stop() {
@@ -188,6 +200,13 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
         _lastKnownClipboardText = text;
       }
     } catch (_) {}
+  }
+
+  Future<void> _handleDirectLocalClipboardPush(String text) async {
+    final clean = text.trim();
+    if (clean.isEmpty || clean == _lastKnownClipboardText) return;
+    _lastKnownClipboardText = clean;
+    await pushClipboardNow(customText: clean, isAuto: true);
   }
 
   Future<void> _checkLocalClipboardAndPush() async {

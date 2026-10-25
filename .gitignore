@@ -61,3 +61,6 @@ device_config.json
 *.env
 .venv/
 .pytest_cache/
+*.db
+*.sqlite
+*.sqlite3

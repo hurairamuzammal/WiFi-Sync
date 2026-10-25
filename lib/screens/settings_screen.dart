@@ -1,10 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/background_sync_service.dart';
 import '../services/clipboard_sync_manager.dart';
 import '../services/firebase_service.dart';
 import '../widgets/brand_logo_icon.dart';
 import '../widgets/google_logo_icon.dart';
 import '../widgets/confirmation_dialog.dart';
+import '../widgets/status_badge.dart';
 import 'auth_screen.dart';
 import 'developer_screen.dart';
 
@@ -20,6 +23,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _useFirebase = true;
   bool _useEmulator = false;
   bool _autoSync = true;
+  bool _isAndroid = false;
+  bool _accessibilityEnabled = false;
+  bool _batteryOptIgnored = false;
+  bool _foregroundServiceActive = false;
 
   @override
   void initState() {
@@ -29,6 +36,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _autoSync = ClipboardSyncManager().autoSyncEnabled;
     _emulatorHostController =
         TextEditingController(text: FirebaseService().emulatorHost);
+    _isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+    if (_isAndroid) {
+      _checkAndroidPermissions();
+    }
+  }
+
+  Future<void> _checkAndroidPermissions() async {
+    final acc = await BackgroundSyncService().isAccessibilityEnabled();
+    final batt = await BackgroundSyncService().isBatteryOptimizationIgnored();
+    final fg = await BackgroundSyncService().isForegroundServiceRunning();
+    if (mounted) {
+      setState(() {
+        _accessibilityEnabled = acc;
+        _batteryOptIgnored = batt;
+        _foregroundServiceActive = fg;
+      });
+    }
   }
 
   @override
@@ -425,6 +449,140 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+
+              // Android Background Keep-Alive & Accessibility Permissions
+              if (_isAndroid) ...[
+                _sectionLabel(theme, 'Android Background Sync & Keep-Alive'),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 4),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _accessibilityEnabled
+                                ? const Color(0xFFE4F4EC)
+                                : const Color(0xFFFCF1DF),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.accessibility_new_rounded,
+                            size: 20,
+                            color: _accessibilityEnabled
+                                ? const Color(0xFF285E45)
+                                : const Color(0xFF7D561E),
+                          ),
+                        ),
+                        title: const Text(
+                          'Accessibility Copy Detector',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: Text(
+                          _accessibilityEnabled
+                              ? 'Active · Captures copied text instantly across all apps'
+                              : 'Bypasses Android 10+ background clipboard restrictions',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        trailing: _accessibilityEnabled
+                            ? const StatusBadge(status: 'Active')
+                            : FilledButton.tonal(
+                                onPressed: () async {
+                                  await BackgroundSyncService()
+                                      .openAccessibilitySettings();
+                                  Future.delayed(const Duration(seconds: 1),
+                                      _checkAndroidPermissions);
+                                },
+                                child: const Text('Enable',
+                                    style: TextStyle(fontSize: 12)),
+                              ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 4),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _batteryOptIgnored
+                                ? const Color(0xFFE4F4EC)
+                                : const Color(0xFFFCF1DF),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.battery_charging_full_rounded,
+                            size: 20,
+                            color: _batteryOptIgnored
+                                ? const Color(0xFF285E45)
+                                : const Color(0xFF7D561E),
+                          ),
+                        ),
+                        title: const Text(
+                          'Battery Optimization Exemption',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: Text(
+                          _batteryOptIgnored
+                              ? 'Unrestricted · Samsung One UI will not sleep background sync'
+                              : 'Prevents OS from sleeping the background sync socket',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        trailing: _batteryOptIgnored
+                            ? const StatusBadge(status: 'Optimized')
+                            : FilledButton.tonal(
+                                onPressed: () async {
+                                  await BackgroundSyncService()
+                                      .requestIgnoreBatteryOptimization();
+                                  Future.delayed(const Duration(seconds: 1),
+                                      _checkAndroidPermissions);
+                                },
+                                child: const Text('Disable',
+                                    style: TextStyle(fontSize: 12)),
+                              ),
+                      ),
+                      const Divider(),
+                      SwitchListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 2),
+                        secondary: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFECE8F8),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.notifications_active_outlined,
+                            size: 20,
+                            color: Color(0xFF423869),
+                          ),
+                        ),
+                        title: const Text(
+                          'Foreground Keep-Alive Service',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: const Text(
+                          'Shows ongoing notification to keep sub-second sync permanently awake',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        value: _foregroundServiceActive,
+                        onChanged: (val) async {
+                          if (val) {
+                            await BackgroundSyncService().startForegroundSync();
+                          } else {
+                            await BackgroundSyncService().stopForegroundSync();
+                          }
+                          await _checkAndroidPermissions();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
             ],
           ),
         ),

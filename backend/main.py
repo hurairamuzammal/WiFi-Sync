@@ -13,6 +13,7 @@ from fastapi import (
     FastAPI,
     HTTPException,
     Depends,
+    Request,
     WebSocket,
     WebSocketDisconnect,
     Query,
@@ -49,6 +50,8 @@ from backend.database import (
 from backend.models import (
     UserRegisterRequest,
     UserLoginRequest,
+    ForgotPasswordRequest,
+    ForgotPasswordResponse,
     TokenResponse,
     UserResponse,
     DeviceCreate,
@@ -71,6 +74,7 @@ from backend.security import (
     create_access_token,
     verify_access_token,
     generate_pairing_code,
+    rate_limiter,
 )
 
 
@@ -250,6 +254,33 @@ def login(req: UserLoginRequest):
         "token_type": "bearer",
         "user_id": user["id"],
         "email": user["email"],
+    }
+
+
+@app.post("/api/v1/auth/forgot-password", response_model=ForgotPasswordResponse)
+def forgot_password(req: ForgotPasswordRequest, request: Request):
+    client_ip = request.client.host if request.client else "unknown"
+    allowed, err_msg = rate_limiter.check_and_record(
+        ip=client_ip,
+        email=req.email,
+        max_per_ip=5,
+        max_per_email=3,
+        window_seconds=900,
+        cooldown_seconds=60,
+    )
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=err_msg or "Rate limit exceeded. Please try again later.",
+        )
+
+    user = get_user_by_email(req.email)
+    if user:
+        record_audit_event(user["id"], "password_reset_requested", metadata={"email": user["email"], "ip": client_ip})
+
+    return {
+        "status": "ok",
+        "message": f"If an account exists for {req.email}, password recovery instructions have been dispatched.",
     }
 
 
