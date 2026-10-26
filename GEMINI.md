@@ -14,4 +14,7 @@
   - [x] **Developer & Version Page (`v2.1.0`)**: Added `DeveloperScreen` featuring **Muhammad Abu Huraira** (`huraira.eqeel@gmail.com`) and colorful purplish brand/launcher icons.
   - [x] **Seamless V2 Auto-Sync & Linux Top Bar**: Added 1s auto-clipboard sync, Samsung floating pill toast + alert sound, unread top-right badge, Linux top bar indicator (`pystray`), and systemd autostart (`world-of-iot-agent.service`).
   - [x] **Private GitHub Repository**: Initialized standalone git repository at `hurairamuzammal/world_of_iot`, secured with sanitized `.gitignore` and `device_config.example.json`, and published to GitHub as a private repository.
+  - [x] **Rate Limiting & Security Hardening**: Added multi-tier sliding-window rate limiters (60s cooldown, 3 per 15 min per email, 6 per hour per device/IP) on password resets with input validation and audit logging.
+  - [x] **Android Accessibility & Keep-Alive Service**: Added `ClipSyncAccessibilityService`, `ClipSyncForegroundService`, battery optimization exemptions, and settings/dashboard controls to enable instantaneous background clipboard detection on Android 10+ and Samsung One UI.
+  - [x] **Rebranding to ClipSync**: Completed full rebranding across Android Manifest, strings, Kotlin services, Flutter screens, Linux desktop runner, Python daemon tray, backend, and documentation.
 
