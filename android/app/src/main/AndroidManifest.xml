@@ -49,6 +49,15 @@
             android:foregroundServiceType="dataSync"
             android:exported="false" />
 
+        <!-- ClipSync Quick Notification Action Receiver -->
+        <receiver
+            android:name=".ClipSyncActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.world_of_iot.ACTION_SYNC_CLIPBOARD" />
+            </intent-filter>
+        </receiver>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

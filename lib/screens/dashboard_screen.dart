@@ -345,7 +345,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     // Soft pastel-harmonious indicator colors for the top-right clipboard icon
     final Color clipStatusColor =
-        (_error != null || !_syncManager.autoSyncEnabled)
+        (_error != null || !_syncManager.isClipboardSyncActive)
             ? const Color(0xFFE56B6F)
             : (hasUnread || onlineCount == 0)
                 ? const Color(0xFFE5A922)
@@ -581,26 +581,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            _devices.isEmpty
-                                                ? 'Waiting for paired device'
-                                                : (onlineCount > 0
-                                                    ? '${_devices.first.displayName} is online'
-                                                    : '${_devices.first.displayName} is offline'),
+                                          const Text(
+                                            'Clipboard Sync',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 14,
-                                              color:
-                                                  theme.colorScheme.onSurface,
+                                              fontSize: 14.5,
                                             ),
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            _syncManager.autoSyncEnabled
-                                                ? 'Clipboard syncs automatically'
-                                                : 'Manual clipboard sync',
+                                            !_syncManager.isClipboardSyncActive
+                                                ? 'Sync turned off · Background service stopped'
+                                                : (_devices.isEmpty
+                                                    ? 'Internet sync · Waiting for paired device'
+                                                    : (onlineCount > 0
+                                                        ? '${_devices.first.displayName} online · Internet sync'
+                                                        : '${_devices.first.displayName} offline · Auto-sync ready')),
                                             style: TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 11.5,
                                               color: theme.colorScheme
                                                   .onSurfaceVariant,
                                             ),
@@ -608,31 +606,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         ],
                                       ),
                                     ),
-                                    TextButton.icon(
-                                      style: TextButton.styleFrom(
-                                        backgroundColor: isDark
-                                            ? const Color(0xFF332E47)
-                                            : Colors.white,
-                                        foregroundColor:
-                                            theme.colorScheme.primary,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 12, vertical: 8),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(11),
+                                    const SizedBox(width: 6),
+                                    if (_syncManager.isClipboardSyncActive)
+                                      IconButton(
+                                        tooltip: 'Send current clipboard now',
+                                        style: IconButton.styleFrom(
+                                          backgroundColor: isDark
+                                              ? const Color(0xFF332E47)
+                                              : Colors.white,
+                                          foregroundColor:
+                                              theme.colorScheme.primary,
+                                          visualDensity: VisualDensity.compact,
                                         ),
-                                      ),
-                                      onPressed: _manualPushClipboard,
-                                      icon: const Icon(
+                                        onPressed: _manualPushClipboard,
+                                        icon: const Icon(
                                           Icons.north_east_rounded,
-                                          size: 15),
-                                      label: const Text(
-                                        'Send Clip',
-                                        style: TextStyle(
-                                          fontSize: 12.5,
-                                          fontWeight: FontWeight.w600,
+                                          size: 17,
                                         ),
                                       ),
+                                    const SizedBox(width: 4),
+                                    Switch(
+                                      value: _syncManager.isClipboardSyncActive,
+                                      onChanged: (val) async {
+                                        await _syncManager
+                                            .setClipboardSyncActive(val);
+                                        setState(() {});
+                                      },
                                     ),
                                   ],
                                 ),

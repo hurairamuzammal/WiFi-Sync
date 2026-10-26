@@ -33,7 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     _useFirebase = ApiService().useFirebase;
     _useEmulator = FirebaseService().useEmulator;
-    _autoSync = ClipboardSyncManager().autoSyncEnabled;
+    _autoSync = ClipboardSyncManager().isClipboardSyncActive;
     _emulatorHostController =
         TextEditingController(text: FirebaseService().emulatorHost);
     _isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
@@ -61,9 +61,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  void _handleToggleAutoSync(bool value) {
-    ClipboardSyncManager().setAutoSync(value);
-    setState(() => _autoSync = value);
+  Future<void> _handleToggleAutoSync(bool value) async {
+    await ClipboardSyncManager().setClipboardSyncActive(value);
+    await _checkAndroidPermissions();
+    if (mounted) {
+      setState(() => _autoSync = value);
+    }
   }
 
   Future<void> _handleToggleFirebase(bool value) async {
@@ -389,12 +392,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 2),
                       title: const Text(
-                        'Auto-sync clipboard',
+                        'Clipboard sync',
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w500),
                       ),
                       subtitle: const Text(
-                        'Sync copied text automatically across online devices',
+                        'Background service & internet sync across devices',
                         style: TextStyle(fontSize: 12),
                       ),
                       value: _autoSync,

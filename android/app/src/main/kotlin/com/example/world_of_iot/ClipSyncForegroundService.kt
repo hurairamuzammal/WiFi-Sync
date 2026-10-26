@@ -14,8 +14,9 @@ import androidx.core.app.NotificationCompat
 /**
  * Android Foreground Service for ClipSync.
  *
- * Prevents Samsung One UI and Android Doze Mode from killing the background
- * WebSocket and SSE telemetry sync loops.
+ * Keeps real-time socket and event listeners active in the background.
+ * Provides a persistent status notification with a direct "Send to Laptop"
+ * action button so users can instantly sync text without opening the app window.
  */
 class ClipSyncForegroundService : Service() {
 
@@ -58,6 +59,14 @@ class ClipSyncForegroundService : Service() {
 
     override fun onDestroy() {
         isRunning = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+        val manager = getSystemService(NotificationManager::class.java)
+        manager?.cancel(NOTIFICATION_ID)
         super.onDestroy()
     }
 
@@ -78,18 +87,38 @@ class ClipSyncForegroundService : Service() {
 
     private fun buildNotification(title: String, content: String): Notification {
         val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
-        val pendingIntent = PendingIntent.getActivity(
+        val pendingLaunch = PendingIntent.getActivity(
             this,
             0,
             launchIntent,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
         )
 
+        // Action button: "Send to Laptop"
+        val syncIntent = Intent(this, ClipSyncActionReceiver::class.java).apply {
+            action = ClipSyncActionReceiver.ACTION_SYNC_CLIPBOARD
+        }
+        val pendingSync = PendingIntent.getBroadcast(
+            this,
+            1,
+            syncIntent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+        )
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(content)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(pendingLaunch)
+            .addAction(
+                android.R.drawable.ic_menu_send,
+                "Send to Laptop",
+                pendingSync
+            )
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()

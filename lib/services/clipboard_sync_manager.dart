@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/device.dart';
 import 'api_service.dart';
 import 'background_sync_service.dart';
@@ -35,11 +36,13 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
   ClipboardSyncManager._internal();
 
   bool _running = false;
+  bool _clipboardSyncActive = true;
   bool _autoSyncEnabled = true;
   bool _hasUnreadClip = false;
   int _unreadCount = 0;
 
   String? _lastKnownClipboardText;
+  String? _lastPushedClipboardText;
   String? _lastEventKey;
   int _startedAtMs = 0;
   final List<ClipboardSyncItem> _history = [];
@@ -54,7 +57,8 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
   /// screen can show a compact Samsung-style floating pill snackbar.
   void Function(ClipboardSyncItem item)? onRemoteClipReceived;
 
-  bool get autoSyncEnabled => _autoSyncEnabled;
+  bool get isClipboardSyncActive => _clipboardSyncActive;
+  bool get autoSyncEnabled => _autoSyncEnabled && _clipboardSyncActive;
   bool get hasUnreadClip => _hasUnreadClip;
   int get unreadCount => _unreadCount;
   List<ClipboardSyncItem> get history => List.unmodifiable(_history);
@@ -90,30 +94,32 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  void start() {
+  Future<void> start() async {
     if (_running) return;
     _running = true;
     _startedAtMs = DateTime.now().millisecondsSinceEpoch;
     WidgetsBinding.instance.addObserver(this);
 
-    // 1. Auto-register/heartbeat mobile device so Linux top bar sees both devices online
+    // 1. Read persistent master switch
+    final prefs = await SharedPreferences.getInstance();
+    _clipboardSyncActive = prefs.getBool('master_clipboard_sync_active') ?? true;
+    _autoSyncEnabled = _clipboardSyncActive;
+
+    // 2. Auto-register/heartbeat device
     _sendDeviceHeartbeat();
-    _heartbeatTimer = Timer.periodic(const Duration(seconds: 15), (_) {
-      _sendDeviceHeartbeat();
-    });
-
-    // 2. Seed current local clipboard so we only auto-push NEW copies
-    _seedInitialClipboard();
-
-    // 3. Watch local clipboard every 400ms for near-instant seamless auto-copy sync
-    _clipboardWatchTimer =
-        Timer.periodic(const Duration(milliseconds: 400), (_) {
-      if (_autoSyncEnabled) {
-        _checkLocalClipboardAndPush();
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 25), (_) {
+      if (_clipboardSyncActive) {
+        _sendDeviceHeartbeat();
       }
     });
 
-    // 4. Subscribe to remote clipboard events from Firebase RTDB
+    // 3. Seed current local clipboard
+    _seedInitialClipboard();
+
+    // 4. Lightweight fallback watch timer (every 2.5s instead of aggressive 400ms to preserve battery)
+    _startWatchTimer();
+
+    // 5. Subscribe to remote clipboard events from Firebase RTDB
     if (ApiService().useFirebase && FirebaseService().isAuthenticated) {
       _devicesSub = FirebaseService().devicesStream().listen((devices) {
         _onlineDevices = devices.where((d) => d.isOnline).toList();
@@ -126,25 +132,58 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
       });
     }
 
-    // 5. Initialize Android Accessibility Service & Foreground Keep-Alive bridge
+    // 6. Initialize Android Accessibility Service & Foreground Keep-Alive bridge
     BackgroundSyncService().init();
     BackgroundSyncService().onExternalClipboardReceived = (text) {
-      if (_running && _autoSyncEnabled) {
+      if (_running && _clipboardSyncActive) {
         _handleDirectLocalClipboardPush(text);
       }
     };
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && _clipboardSyncActive) {
       BackgroundSyncService().startForegroundSync();
     }
+  }
+
+  void _startWatchTimer() {
+    _clipboardWatchTimer?.cancel();
+    _clipboardWatchTimer = Timer.periodic(const Duration(milliseconds: 2500), (_) {
+      if (_running && _clipboardSyncActive) {
+        _checkLocalClipboardAndPush();
+      }
+    });
   }
 
   void stop() {
     _running = false;
     WidgetsBinding.instance.removeObserver(this);
     _clipboardWatchTimer?.cancel();
+    _clipboardWatchTimer = null;
     _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
     _remoteClipSub?.cancel();
     _devicesSub?.cancel();
+  }
+
+  Future<void> setClipboardSyncActive(bool enabled) async {
+    _clipboardSyncActive = enabled;
+    _autoSyncEnabled = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('master_clipboard_sync_active', enabled);
+
+    if (!enabled) {
+      _clipboardWatchTimer?.cancel();
+      _clipboardWatchTimer = null;
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+        await BackgroundSyncService().stopForegroundSync();
+      }
+    } else {
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+        await BackgroundSyncService().startForegroundSync();
+      }
+      _startWatchTimer();
+      await _checkLocalClipboardAndPush();
+    }
+    notifyListeners();
   }
 
   void setAutoSync(bool value) {
@@ -204,22 +243,25 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _handleDirectLocalClipboardPush(String text) async {
     final clean = text.trim();
-    if (clean.isEmpty || clean == _lastKnownClipboardText) return;
+    if (clean.isEmpty || clean == _lastPushedClipboardText) return;
+    _lastPushedClipboardText = clean;
     _lastKnownClipboardText = clean;
     await pushClipboardNow(customText: clean, isAuto: true);
   }
 
   Future<void> _checkLocalClipboardAndPush() async {
-    // On Linux Desktop, the Python background agent already watches xclip every 1s,
+    // On Linux Desktop, the Python background agent already watches xclip,
     // so only auto-watch from Flutter on Android/iOS/Web to avoid duplicate pushes.
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.linux) return;
+    if (!_clipboardSyncActive) return;
 
     try {
       final data = await Clipboard.getData(Clipboard.kTextPlain);
       final text = data?.text?.trim();
       if (text == null || text.isEmpty) return;
-      if (text == _lastKnownClipboardText) return;
+      if (text == _lastPushedClipboardText) return;
 
+      _lastPushedClipboardText = text;
       _lastKnownClipboardText = text;
       await pushClipboardNow(customText: text, isAuto: true);
     } catch (_) {}
@@ -235,6 +277,7 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
       if (text == null || text.isEmpty) return false;
 
       _lastKnownClipboardText = text;
+      _lastPushedClipboardText = text;
       final nowMs = DateTime.now().millisecondsSinceEpoch;
       final evtId = 'evt_$nowMs';
       _lastEventKey = nowMs.toString();
@@ -282,6 +325,7 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
     _lastEventKey = createdAt;
     if (text == _lastKnownClipboardText) return;
     _lastKnownClipboardText = text;
+    _lastPushedClipboardText = text;
 
     await Clipboard.setData(ClipboardData(text: text));
 
