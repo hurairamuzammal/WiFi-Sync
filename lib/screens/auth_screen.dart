@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/clipboard_sync_manager.dart';
+import '../services/firebase_service.dart';
 import '../widgets/brand_logo_icon.dart';
 import '../widgets/google_logo_icon.dart';
 import 'dashboard_screen.dart';
 import 'developer_screen.dart';
+import 'legal_and_faq_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -377,6 +379,271 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
+  void _showFirebaseSetupDialog() {
+    final fb = FirebaseService();
+    final initialProj = fb.customProjectId ??
+        (fb.activeProjectId.startsWith('your-') ? '' : fb.activeProjectId);
+    final initialKey = fb.customApiKey ??
+        (fb.activeApiKey.startsWith('YOUR_') ? '' : fb.activeApiKey);
+    final initialUrl = fb.customDatabaseUrl ??
+        (fb.activeDatabaseUrl.contains('your-') ? '' : fb.activeDatabaseUrl);
+
+    final projController = TextEditingController(text: initialProj);
+    final keyController = TextEditingController(text: initialKey);
+    final urlController = TextEditingController(text: initialUrl);
+
+    bool isTesting = false;
+    String? testResult;
+    bool? testSuccess;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) {
+          final theme = Theme.of(ctx);
+          final insets = MediaQuery.of(ctx).viewInsets.bottom;
+
+          return Padding(
+            padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + insets),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.cloud_sync_outlined,
+                            color: theme.colorScheme.primary, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Connect Your Free Firebase',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Text(
+                              'Private, free personal cloud backend (\$0 cost)',
+                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: projController,
+                    decoration: const InputDecoration(
+                      labelText: 'Firebase Project ID',
+                      hintText: 'e.g. my-clipsync-hub',
+                      isDense: true,
+                      prefixIcon: Icon(Icons.folder_outlined, size: 20),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: keyController,
+                    decoration: const InputDecoration(
+                      labelText: 'Web / REST API Key',
+                      hintText: 'e.g. AIzaSy...',
+                      isDense: true,
+                      prefixIcon: Icon(Icons.key_outlined, size: 20),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: urlController,
+                    decoration: const InputDecoration(
+                      labelText: 'Database URL (optional)',
+                      hintText: 'https://<project-id>-default-rtdb.firebaseio.com',
+                      isDense: true,
+                      prefixIcon: Icon(Icons.link_outlined, size: 20),
+                    ),
+                  ),
+                  if (testResult != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: (testSuccess ?? false)
+                            ? const Color(0xFFE4F4EC)
+                            : const Color(0xFFFDE8E8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            (testSuccess ?? false)
+                                ? Icons.check_circle_outline
+                                : Icons.error_outline,
+                            color: (testSuccess ?? false)
+                                ? const Color(0xFF285E45)
+                                : const Color(0xFFD95C63),
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              testResult!,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: (testSuccess ?? false)
+                                    ? const Color(0xFF285E45)
+                                    : const Color(0xFFD95C63),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: isTesting
+                              ? null
+                              : () async {
+                                  final p = projController.text.trim();
+                                  final k = keyController.text.trim();
+                                  final u = urlController.text.trim();
+                                  if (p.isEmpty || k.isEmpty) {
+                                    setModalState(() {
+                                      testResult =
+                                          'Project ID and API Key required';
+                                      testSuccess = false;
+                                    });
+                                    return;
+                                  }
+                                  setModalState(() {
+                                    isTesting = true;
+                                    testResult = null;
+                                  });
+                                  final ok = await fb.testFirebaseConnection(
+                                    projectId: p,
+                                    apiKey: k,
+                                    databaseUrl: u,
+                                  );
+                                  setModalState(() {
+                                    isTesting = false;
+                                    testSuccess = ok;
+                                    testResult = ok
+                                        ? 'Connection successful! Database is reachable.'
+                                        : 'Could not connect. Verify API Key and Project ID.';
+                                  });
+                                },
+                          child: isTesting
+                              ? const SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Text('Test Connection'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () async {
+                            final p = projController.text.trim();
+                            final k = keyController.text.trim();
+                            final u = urlController.text.trim();
+                            if (p.isEmpty || k.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Please enter Project ID and API Key')),
+                              );
+                              return;
+                            }
+                            await fb.saveCustomFirebaseConfig(
+                              projectId: p,
+                              apiKey: k,
+                              databaseUrl: u,
+                            );
+                            if (!ctx.mounted) return;
+                            Navigator.of(ctx).pop();
+                            setState(() {});
+                            if (mounted) {
+                              ClipboardSyncManager.showSamsungPillToast(
+                                context,
+                                title: 'Cloud Connected',
+                                preview: p,
+                                icon: Icons.cloud_done_rounded,
+                              );
+                            }
+                          },
+                          child: const Text('Save & Apply'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          await fb.clearCustomFirebaseConfig();
+                          if (!ctx.mounted) return;
+                          Navigator.of(ctx).pop();
+                          setState(() {});
+                        },
+                        child: const Text('Reset', style: TextStyle(fontSize: 12)),
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.help_outline_rounded, size: 16),
+                        label: const Text('3-Min Free Setup Guide',
+                            style: TextStyle(fontSize: 12)),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const LegalAndFaqScreen(initialTabIndex: 4),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _dividerWithText(ThemeData theme, String text) {
     return Row(
       children: [
@@ -430,7 +697,47 @@ class _AuthScreenState extends State<AuthScreen>
                       fontSize: 12.5,
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 18),
+                  // Bring-Your-Own-Firebase Quick Connect Strip
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFECE8F8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFDAD3F0)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.cloud_outlined,
+                            size: 18, color: Color(0xFF5D5094)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            FirebaseService().hasCustomConfig
+                                ? 'Cloud: ${FirebaseService().activeProjectId}'
+                                : 'Bring Your Own Firebase (\$0 Free Tier)',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF342C54),
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: _showFirebaseSetupDialog,
+                          child: const Text('Connect',
+                              style: TextStyle(fontSize: 11.5)),
+                        ),
+                      ],
+                    ),
+                  ),
                   if (_errorMessage != null)
                     Container(
                       margin: const EdgeInsets.only(bottom: 14),
@@ -738,6 +1045,72 @@ class _AuthScreenState extends State<AuthScreen>
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                        ),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 1),
+                          ),
+                        ),
+                        child: const Text('Privacy Policy',
+                            style: TextStyle(fontSize: 11)),
+                      ),
+                      const Text('·', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                        ),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 2),
+                          ),
+                        ),
+                        child:
+                            const Text('Terms', style: TextStyle(fontSize: 11)),
+                      ),
+                      const Text('·', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                        ),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 0),
+                          ),
+                        ),
+                        child:
+                            const Text('FAQ', style: TextStyle(fontSize: 11)),
+                      ),
+                      const Text('·', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                        ),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 3),
+                          ),
+                        ),
+                        child: const Text('Support',
+                            style: TextStyle(fontSize: 11)),
+                      ),
+                    ],
                   ),
                 ],
               ),

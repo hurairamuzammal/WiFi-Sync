@@ -10,6 +10,7 @@ import '../widgets/confirmation_dialog.dart';
 import '../widgets/status_badge.dart';
 import 'auth_screen.dart';
 import 'developer_screen.dart';
+import 'legal_and_faq_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -132,6 +133,336 @@ class _SettingsScreenState extends State<SettingsScreen> {
         (route) => false,
       );
     }
+  }
+
+  Future<void> _handleClearCloudClipboard() async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Clear Cloud Clipboard',
+      message:
+          'Permanently remove all synchronized clipboard history from your Firebase database? Local device clipboards will remain untouched.',
+      confirmLabel: 'Clear Cloud Data',
+      confirmColor: const Color(0xFFD95C63),
+      icon: Icons.delete_sweep_outlined,
+    );
+    if (!confirmed) return;
+
+    try {
+      await ApiService().clearCloudClipboardHistory();
+      if (!mounted) return;
+      ClipboardSyncManager.showSamsungPillToast(
+        context,
+        title: 'Cloud History Cleared',
+        preview: 'All remote clipboard entries wiped',
+        icon: Icons.check_circle_outline_rounded,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to clear clipboard: $e')),
+      );
+    }
+  }
+
+  Future<void> _handleDeleteAccountAndData() async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Delete Account & Wipe Data',
+      message:
+          'GDPR Article 17: Right to Erasure.\n\nThis permanently destroys your user account, device registrations, and cloud clipboard events from Firebase. This action CANNOT be undone.',
+      confirmLabel: 'Permanently Delete',
+      confirmColor: const Color(0xFFD95C63),
+      icon: Icons.warning_amber_rounded,
+    );
+    if (!confirmed) return;
+
+    ClipboardSyncManager().stop();
+    try {
+      await ApiService().deleteAccountAndData();
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete account: $e')),
+      );
+    }
+  }
+
+  void _showFirebaseConfigDialog() {
+    final fb = FirebaseService();
+    final initialProj = fb.customProjectId ??
+        (fb.activeProjectId.startsWith('your-') ? '' : fb.activeProjectId);
+    final initialKey = fb.customApiKey ??
+        (fb.activeApiKey.startsWith('YOUR_') ? '' : fb.activeApiKey);
+    final initialUrl = fb.customDatabaseUrl ??
+        (fb.activeDatabaseUrl.contains('your-') ? '' : fb.activeDatabaseUrl);
+
+    final projController = TextEditingController(text: initialProj);
+    final keyController = TextEditingController(text: initialKey);
+    final urlController = TextEditingController(text: initialUrl);
+
+    bool isTesting = false;
+    String? testResult;
+    bool? testSuccess;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) {
+          final theme = Theme.of(ctx);
+          final insets = MediaQuery.of(ctx).viewInsets.bottom;
+
+          return Padding(
+            padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + insets),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.cloud_sync_outlined,
+                            color: theme.colorScheme.primary, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Connect Your Free Firebase',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Text(
+                              'Use your personal free cloud tier (\$0 cost)',
+                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: projController,
+                    decoration: const InputDecoration(
+                      labelText: 'Firebase Project ID',
+                      hintText: 'e.g. my-clipsync-free',
+                      isDense: true,
+                      prefixIcon: Icon(Icons.folder_outlined, size: 20),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: keyController,
+                    decoration: const InputDecoration(
+                      labelText: 'Web / REST API Key',
+                      hintText: 'e.g. AIzaSy...',
+                      isDense: true,
+                      prefixIcon: Icon(Icons.key_outlined, size: 20),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: urlController,
+                    decoration: const InputDecoration(
+                      labelText: 'Database URL (optional)',
+                      hintText: 'https://<project-id>-default-rtdb.firebaseio.com',
+                      isDense: true,
+                      prefixIcon: Icon(Icons.link_outlined, size: 20),
+                    ),
+                  ),
+                  if (testResult != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: (testSuccess ?? false)
+                            ? const Color(0xFFE4F4EC)
+                            : const Color(0xFFFDE8E8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            (testSuccess ?? false)
+                                ? Icons.check_circle_outline
+                                : Icons.error_outline,
+                            color: (testSuccess ?? false)
+                                ? const Color(0xFF285E45)
+                                : const Color(0xFFD95C63),
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              testResult!,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: (testSuccess ?? false)
+                                    ? const Color(0xFF285E45)
+                                    : const Color(0xFFD95C63),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: isTesting
+                              ? null
+                              : () async {
+                                  final p = projController.text.trim();
+                                  final k = keyController.text.trim();
+                                  final u = urlController.text.trim();
+                                  if (p.isEmpty || k.isEmpty) {
+                                    setModalState(() {
+                                      testResult =
+                                          'Project ID and API Key required';
+                                      testSuccess = false;
+                                    });
+                                    return;
+                                  }
+                                  setModalState(() {
+                                    isTesting = true;
+                                    testResult = null;
+                                  });
+                                  final ok = await fb.testFirebaseConnection(
+                                    projectId: p,
+                                    apiKey: k,
+                                    databaseUrl: u,
+                                  );
+                                  setModalState(() {
+                                    isTesting = false;
+                                    testSuccess = ok;
+                                    testResult = ok
+                                        ? 'Connection successful! Database reachable.'
+                                        : 'Could not connect. Verify API Key and Project ID.';
+                                  });
+                                },
+                          child: isTesting
+                              ? const SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Text('Test Connection'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () async {
+                            final p = projController.text.trim();
+                            final k = keyController.text.trim();
+                            final u = urlController.text.trim();
+                            if (p.isEmpty || k.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Please enter Project ID and API Key')),
+                              );
+                              return;
+                            }
+                            await fb.saveCustomFirebaseConfig(
+                              projectId: p,
+                              apiKey: k,
+                              databaseUrl: u,
+                            );
+                            if (!ctx.mounted) return;
+                            Navigator.of(ctx).pop();
+                            setState(() {});
+                            if (mounted) {
+                              ClipboardSyncManager.showSamsungPillToast(
+                                context,
+                                title: 'Cloud Backend Updated',
+                                preview: 'Connected to $p',
+                                icon: Icons.cloud_done_rounded,
+                              );
+                            }
+                          },
+                          child: const Text('Save & Apply'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          await fb.clearCustomFirebaseConfig();
+                          if (!ctx.mounted) return;
+                          Navigator.of(ctx).pop();
+                          setState(() {});
+                          if (mounted) {
+                            ClipboardSyncManager.showSamsungPillToast(
+                              context,
+                              title: 'Reset to Template',
+                              preview: 'Default template restored',
+                              icon: Icons.restore_rounded,
+                            );
+                          }
+                        },
+                        child: const Text('Reset', style: TextStyle(fontSize: 12)),
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.help_outline_rounded, size: 16),
+                        label: const Text('3-Min Setup Guide',
+                            style: TextStyle(fontSize: 12)),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const LegalAndFaqScreen(initialTabIndex: 4),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _sectionLabel(ThemeData theme, String label) {
@@ -586,6 +917,235 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 24),
               ],
+
+              // Bring-Your-Own-Firebase Cloud Configuration
+              _sectionLabel(theme, 'Cloud Backend (Bring Your Own Firebase)'),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFECE8F8),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.cloud_outlined,
+                            size: 20, color: Color(0xFF5D5094)),
+                      ),
+                      title: const Text(
+                        'Firebase Cloud Project',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: Text(
+                        'Project: ${FirebaseService().activeProjectId}\nStatus: ${FirebaseService().hasCustomConfig ? "Custom Cloud (\$0 Cost)" : "Default / Template"}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      isThreeLine: true,
+                      trailing: FilledButton.tonal(
+                        onPressed: _showFirebaseConfigDialog,
+                        child: const Text('Configure',
+                            style: TextStyle(fontSize: 12)),
+                      ),
+                    ),
+                    const Divider(),
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      leading: const Icon(Icons.help_outline_rounded, size: 20),
+                      title: const Text(
+                        'Free Firebase Setup Guide',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: const Text(
+                        'Step-by-step 3-minute tutorial with 100% free tier',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 4),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Legal, Regulations & Support
+              _sectionLabel(theme, 'Help, Legal & Compliance (GDPR / CCPA)'),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      leading: const Icon(Icons.quiz_outlined, size: 20),
+                      title: const Text(
+                        'Frequently Asked Questions (FAQ)',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: const Text(
+                        'Security, battery optimization, and sync architecture',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 0),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      leading: const Icon(Icons.privacy_tip_outlined, size: 20),
+                      title: const Text(
+                        'Privacy Policy',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: const Text(
+                        'Zero-tracker disclosure, encryption in transit, data rights',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 1),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      leading: const Icon(Icons.gavel_rounded, size: 20),
+                      title: const Text(
+                        'Terms of Service & EULA',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: const Text(
+                        'MIT License, liability disclaimer, sensitive text notices',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 2),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      leading: const Icon(Icons.support_agent_rounded, size: 20),
+                      title: const Text(
+                        'Contact Developer & Support',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: const Text(
+                        'huraira.eqeel@gmail.com · GitHub issues',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LegalAndFaqScreen(initialTabIndex: 3),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Data Management & GDPR Right to Erasure
+              _sectionLabel(theme, 'Data Management & Privacy Rights'),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      leading: Icon(
+                        Icons.delete_sweep_outlined,
+                        size: 20,
+                        color: theme.colorScheme.primary,
+                      ),
+                      title: const Text(
+                        'Clear Cloud Clipboard History',
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: const Text(
+                        'Wipe all synchronized clipboard events from Firebase',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      trailing: TextButton(
+                        onPressed: _handleClearCloudClipboard,
+                        child: const Text('Clear', style: TextStyle(fontSize: 12.5)),
+                      ),
+                    ),
+                    const Divider(),
+                    ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 2),
+                      leading: Icon(
+                        Icons.person_remove_rounded,
+                        size: 20,
+                        color: theme.colorScheme.error,
+                      ),
+                      title: Text(
+                        'Delete Account & Cloud Data',
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w500,
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                      subtitle: const Text(
+                        'GDPR Article 17: Right to Erasure (destroys account and all records)',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      trailing: TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: theme.colorScheme.error,
+                        ),
+                        onPressed: _handleDeleteAccountAndData,
+                        child: const Text('Delete', style: TextStyle(fontSize: 12.5)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),

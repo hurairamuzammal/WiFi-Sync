@@ -69,4 +69,20 @@ void main() {
     expect(find.text('Used Google Sign-In? Tap here'), findsOneWidget);
     expect(find.text('Account Email'), findsOneWidget);
   });
+
+  testWidgets('AuthScreen displays Privacy Policy, Terms, FAQ, and Cloud connect strip',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const WorldOfItApp());
+    await tester.pumpAndSettle();
+
+    // Verify Cloud connect strip is displayed
+    expect(find.text('Bring Your Own Firebase (\$0 Free Tier)'), findsOneWidget);
+    expect(find.text('Connect'), findsOneWidget);
+
+    // Verify compliance and help links
+    expect(find.text('Privacy Policy'), findsOneWidget);
+    expect(find.text('Terms'), findsOneWidget);
+    expect(find.text('FAQ'), findsOneWidget);
+    expect(find.text('Support'), findsOneWidget);
+  });
 }

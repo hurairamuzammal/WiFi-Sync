@@ -64,3 +64,13 @@ device_config.json
 *.db
 *.sqlite
 *.sqlite3
+
+# Non-Flutter legacy components (kept locally, excluded from GitHub repository)
+backend/
+agent/
+deploy/
+tests/
+plan/
+dist/
+release-assets/
+

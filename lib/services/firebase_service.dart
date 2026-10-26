@@ -25,9 +25,22 @@ class FirebaseService {
   static const String _restEmailKey = 'fb_rest_email';
   static const String _restProviderKey = 'fb_rest_provider';
 
+  // Bring-Your-Own-Firebase Custom Project keys
+  static const String _customProjectIdKey = 'fb_custom_project_id';
+  static const String _customApiKeyKey = 'fb_custom_api_key';
+  static const String _customDatabaseUrlKey = 'fb_custom_database_url';
+  static const String _customAppIdKey = 'fb_custom_app_id';
+  static const String _customSenderIdKey = 'fb_custom_sender_id';
+
   bool _initialized = false;
   bool _useEmulator = false;
   String _emulatorHost = '127.0.0.1';
+
+  String? _customProjectId;
+  String? _customApiKey;
+  String? _customDatabaseUrl;
+  String? _customAppId;
+  String? _customSenderId;
 
   FirebaseAuth? _auth;
   FirebaseDatabase? _database;
@@ -44,11 +57,46 @@ class FirebaseService {
   bool get _useRestClient =>
       !kIsWeb && defaultTargetPlatform == TargetPlatform.linux;
 
-  String get _apiKey => DefaultFirebaseOptions.linux.apiKey;
-  String get _rtdbBaseUrl =>
-      (DefaultFirebaseOptions.linux.databaseURL ??
-              'https://world-of-iot-hub-default-rtdb.firebaseio.com')
-          .replaceAll(RegExp(r'/+$'), '');
+  String? get customProjectId => _customProjectId;
+  String? get customApiKey => _customApiKey;
+  String? get customDatabaseUrl => _customDatabaseUrl;
+  bool get hasCustomConfig =>
+      _customProjectId != null && _customProjectId!.isNotEmpty;
+
+  String get activeProjectId {
+    if (_customProjectId != null && _customProjectId!.isNotEmpty) {
+      return _customProjectId!;
+    }
+    return DefaultFirebaseOptions.currentPlatform.projectId;
+  }
+
+  String get activeApiKey {
+    if (_customApiKey != null && _customApiKey!.isNotEmpty) {
+      return _customApiKey!;
+    }
+    return DefaultFirebaseOptions.linux.apiKey;
+  }
+
+  String get activeDatabaseUrl {
+    if (_customDatabaseUrl != null && _customDatabaseUrl!.isNotEmpty) {
+      return _customDatabaseUrl!.replaceAll(RegExp(r'/+$'), '');
+    }
+    return (DefaultFirebaseOptions.linux.databaseURL ??
+            'https://$activeProjectId-default-rtdb.firebaseio.com')
+        .replaceAll(RegExp(r'/+$'), '');
+  }
+
+  String get _apiKey => activeApiKey;
+  String get _rtdbBaseUrl => activeDatabaseUrl;
+
+  bool get isConfigured {
+    final key = _apiKey;
+    final proj = activeProjectId;
+    return key.isNotEmpty &&
+        !key.startsWith('YOUR_') &&
+        !proj.startsWith('your-') &&
+        !key.contains('REPLACE_WITH');
+  }
 
   bool get isInitialized => _initialized;
   bool get useEmulator => _useEmulator;
@@ -85,6 +133,12 @@ class FirebaseService {
       _useEmulator = prefs.getBool(_useEmulatorKey) ?? false;
       _emulatorHost = prefs.getString(_emulatorHostKey) ?? '127.0.0.1';
 
+      _customProjectId = prefs.getString(_customProjectIdKey);
+      _customApiKey = prefs.getString(_customApiKeyKey);
+      _customDatabaseUrl = prefs.getString(_customDatabaseUrlKey);
+      _customAppId = prefs.getString(_customAppIdKey);
+      _customSenderId = prefs.getString(_customSenderIdKey);
+
       if (_useRestClient) {
         _restIdToken = prefs.getString(_restIdTokenKey);
         _restRefreshToken = prefs.getString(_restRefreshTokenKey);
@@ -99,8 +153,20 @@ class FirebaseService {
       }
 
       if (Firebase.apps.isEmpty) {
+        FirebaseOptions options = DefaultFirebaseOptions.currentPlatform;
+        if (hasCustomConfig && _customApiKey != null) {
+          options = FirebaseOptions(
+            apiKey: _customApiKey!,
+            appId: _customAppId ?? options.appId,
+            messagingSenderId: _customSenderId ?? options.messagingSenderId,
+            projectId: _customProjectId!,
+            databaseURL: _customDatabaseUrl ??
+                'https://${_customProjectId!}-default-rtdb.firebaseio.com',
+            storageBucket: '${_customProjectId!}.firebasestorage.app',
+          );
+        }
         await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
+          options: options,
         );
       }
 
@@ -1121,5 +1187,178 @@ class FirebaseService {
       'createdAt': now,
       'metadata': metadata ?? {},
     });
+  }
+
+  // ---------------- Bring-Your-Own-Firebase Custom Config ----------------
+
+  Future<void> saveCustomFirebaseConfig({
+    required String projectId,
+    required String apiKey,
+    required String databaseUrl,
+    String? appId,
+    String? messagingSenderId,
+  }) async {
+    final cleanProj = projectId.trim();
+    final cleanKey = apiKey.trim();
+    var cleanUrl = databaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+    if (cleanUrl.isEmpty) {
+      cleanUrl = 'https://$cleanProj-default-rtdb.firebaseio.com';
+    }
+
+    _customProjectId = cleanProj;
+    _customApiKey = cleanKey;
+    _customDatabaseUrl = cleanUrl;
+    _customAppId = appId?.trim();
+    _customSenderId = messagingSenderId?.trim();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_customProjectIdKey, cleanProj);
+    await prefs.setString(_customApiKeyKey, cleanKey);
+    await prefs.setString(_customDatabaseUrlKey, cleanUrl);
+    if (appId != null && appId.isNotEmpty) {
+      await prefs.setString(_customAppIdKey, appId.trim());
+    } else {
+      await prefs.remove(_customAppIdKey);
+    }
+    if (messagingSenderId != null && messagingSenderId.isNotEmpty) {
+      await prefs.setString(_customSenderIdKey, messagingSenderId.trim());
+    } else {
+      await prefs.remove(_customSenderIdKey);
+    }
+
+    // Reset session so user signs in cleanly to their new cloud
+    if (_useRestClient) {
+      _restIdToken = null;
+      _restRefreshToken = null;
+      _restUid = null;
+      _restEmail = null;
+      await prefs.remove(_restIdTokenKey);
+      await prefs.remove(_restRefreshTokenKey);
+      await prefs.remove(_restUidKey);
+      await prefs.remove(_restEmailKey);
+    } else {
+      try {
+        await _auth?.signOut();
+      } catch (_) {}
+    }
+  }
+
+  Future<void> clearCustomFirebaseConfig() async {
+    _customProjectId = null;
+    _customApiKey = null;
+    _customDatabaseUrl = null;
+    _customAppId = null;
+    _customSenderId = null;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_customProjectIdKey);
+    await prefs.remove(_customApiKeyKey);
+    await prefs.remove(_customDatabaseUrlKey);
+    await prefs.remove(_customAppIdKey);
+    await prefs.remove(_customSenderIdKey);
+  }
+
+  Future<bool> testFirebaseConnection({
+    required String projectId,
+    required String apiKey,
+    required String databaseUrl,
+  }) async {
+    try {
+      final cleanKey = apiKey.trim();
+      var cleanUrl = databaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+      if (cleanUrl.isEmpty) {
+        cleanUrl = 'https://${projectId.trim()}-default-rtdb.firebaseio.com';
+      }
+
+      // Test 1: Check Auth endpoint with provided API key
+      final authUri = Uri.parse(
+        'https://identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key=$cleanKey',
+      );
+      final authResp = await _httpClient.post(
+        authUri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'continueUri': 'http://localhost'}),
+      );
+
+      if (authResp.statusCode == 200 || authResp.statusCode == 400) {
+        final body = jsonDecode(authResp.body);
+        if (body is Map && body.containsKey('error')) {
+          final err = body['error'];
+          if (err is Map && err['message'] == 'API_KEY_INVALID') {
+            return false;
+          }
+        }
+      }
+
+      // Test 2: Check RTDB accessibility (401, 403 or 200 indicate active database endpoint)
+      final rtdbUri = Uri.parse('$cleanUrl/.json?shallow=true');
+      final rtdbResp = await _httpClient.get(rtdbUri);
+      return rtdbResp.statusCode == 200 ||
+          rtdbResp.statusCode == 401 ||
+          rtdbResp.statusCode == 403;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ---------------- GDPR & CCPA Compliance & Erasure ----------------
+
+  /// Permanently delete all cloud clipboard history for current user.
+  Future<void> clearCloudClipboardHistory() async {
+    final uid = currentUserId;
+    if (uid == null) return;
+    try {
+      if (_useRestClient) {
+        await _restPut('users/$uid/clipboardEvents', {});
+      } else {
+        await _userRef()?.child('clipboardEvents').remove();
+      }
+    } catch (e) {
+      debugPrint('Clear cloud clipboard error: $e');
+      rethrow;
+    }
+  }
+
+  /// GDPR Article 17: Right to Erasure. Permanently delete all user nodes & auth account.
+  Future<void> deleteAccountAndData() async {
+    final uid = currentUserId;
+    if (uid == null) return;
+    try {
+      // 1. Wipe user data tree in RTDB
+      if (_useRestClient) {
+        try {
+          await _httpClient.delete(
+            Uri.parse('$_rtdbBaseUrl/users/$uid.json?auth=$_restIdToken'),
+          );
+        } catch (_) {}
+      } else {
+        try {
+          await _userRef()?.remove();
+        } catch (_) {}
+      }
+
+      // 2. Delete user authentication account
+      if (_useRestClient) {
+        await _httpClient.post(
+          Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:delete?key=$_apiKey'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'idToken': _restIdToken}),
+        );
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_restIdTokenKey);
+        await prefs.remove(_restRefreshTokenKey);
+        await prefs.remove(_restUidKey);
+        await prefs.remove(_restEmailKey);
+        _restIdToken = null;
+        _restRefreshToken = null;
+        _restUid = null;
+        _restEmail = null;
+      } else {
+        await _auth?.currentUser?.delete();
+      }
+    } catch (e) {
+      debugPrint('Delete account error: $e');
+      rethrow;
+    }
   }
 }

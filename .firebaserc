@@ -1,5 +1,5 @@
 {
   "projects": {
-    "default": "world-of-iot-hub"
+    "default": "your-firebase-project-id"
   }
 }

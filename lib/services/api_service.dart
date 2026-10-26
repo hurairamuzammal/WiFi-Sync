@@ -388,6 +388,21 @@ class ApiService {
     }
   }
 
+  // ---------------- GDPR & Privacy Erasure ----------------
+
+  Future<void> clearCloudClipboardHistory() async {
+    if (_useFirebase) {
+      await FirebaseService().clearCloudClipboardHistory();
+    }
+  }
+
+  Future<void> deleteAccountAndData() async {
+    if (_useFirebase) {
+      await FirebaseService().deleteAccountAndData();
+    }
+    await logOut();
+  }
+
   String _parseError(String body) {
     try {
       final json = jsonDecode(body);

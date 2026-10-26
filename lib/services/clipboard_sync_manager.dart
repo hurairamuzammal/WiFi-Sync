@@ -250,9 +250,6 @@ class ClipboardSyncManager extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _checkLocalClipboardAndPush() async {
-    // On Linux Desktop, the Python background agent already watches xclip,
-    // so only auto-watch from Flutter on Android/iOS/Web to avoid duplicate pushes.
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.linux) return;
     if (!_clipboardSyncActive) return;
 
     try {

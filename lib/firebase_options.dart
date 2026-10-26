@@ -1,4 +1,6 @@
-// File generated for World of IT Firebase configuration (world-of-iot-hub).
+// Template Firebase Options for ClipSync.
+// Connect your own free Firebase project by replacing the placeholders below
+// or by entering your credentials directly in the in-app Firebase Setup screen.
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
@@ -27,61 +29,61 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAZ8bHRixieDYqvexQyrDmaCEPO8MGaiSE',
-    appId: '1:444951093704:web:98dfa2b4c99a04d8e6a0fd',
-    messagingSenderId: '444951093704',
-    projectId: 'world-of-iot-hub',
-    authDomain: 'world-of-iot-hub.firebaseapp.com',
-    databaseURL: 'https://world-of-iot-hub-default-rtdb.firebaseio.com',
-    storageBucket: 'world-of-iot-hub.firebasestorage.app',
+    apiKey: 'YOUR_FIREBASE_API_KEY',
+    appId: '1:1234567890:web:abcdef012345',
+    messagingSenderId: '1234567890',
+    projectId: 'your-firebase-project-id',
+    authDomain: 'your-firebase-project-id.firebaseapp.com',
+    databaseURL: 'https://your-firebase-project-id-default-rtdb.firebaseio.com',
+    storageBucket: 'your-firebase-project-id.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCIq7EqH9feI9vBkhYJgZ8iAglty0_iuVI',
-    appId: '1:444951093704:android:2f1e5bd2896d82f6e6a0fd',
-    messagingSenderId: '444951093704',
-    projectId: 'world-of-iot-hub',
-    databaseURL: 'https://world-of-iot-hub-default-rtdb.firebaseio.com',
-    storageBucket: 'world-of-iot-hub.firebasestorage.app',
+    apiKey: 'YOUR_FIREBASE_API_KEY',
+    appId: '1:1234567890:android:abcdef012345',
+    messagingSenderId: '1234567890',
+    projectId: 'your-firebase-project-id',
+    databaseURL: 'https://your-firebase-project-id-default-rtdb.firebaseio.com',
+    storageBucket: 'your-firebase-project-id.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD14uIS-cj8h5vQPcwmtuJO-G0grStrV-w',
-    appId: '1:444951093704:ios:e43df725024d3869e6a0fd',
-    messagingSenderId: '444951093704',
-    projectId: 'world-of-iot-hub',
-    databaseURL: 'https://world-of-iot-hub-default-rtdb.firebaseio.com',
-    storageBucket: 'world-of-iot-hub.firebasestorage.app',
+    apiKey: 'YOUR_FIREBASE_API_KEY',
+    appId: '1:1234567890:ios:abcdef012345',
+    messagingSenderId: '1234567890',
+    projectId: 'your-firebase-project-id',
+    databaseURL: 'https://your-firebase-project-id-default-rtdb.firebaseio.com',
+    storageBucket: 'your-firebase-project-id.firebasestorage.app',
     iosBundleId: 'com.example.worldOfIot',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyD14uIS-cj8h5vQPcwmtuJO-G0grStrV-w',
-    appId: '1:444951093704:ios:e43df725024d3869e6a0fd',
-    messagingSenderId: '444951093704',
-    projectId: 'world-of-iot-hub',
-    databaseURL: 'https://world-of-iot-hub-default-rtdb.firebaseio.com',
-    storageBucket: 'world-of-iot-hub.firebasestorage.app',
+    apiKey: 'YOUR_FIREBASE_API_KEY',
+    appId: '1:1234567890:ios:abcdef012345',
+    messagingSenderId: '1234567890',
+    projectId: 'your-firebase-project-id',
+    databaseURL: 'https://your-firebase-project-id-default-rtdb.firebaseio.com',
+    storageBucket: 'your-firebase-project-id.firebasestorage.app',
     iosBundleId: 'com.example.worldOfIot',
   );
 
   static const FirebaseOptions linux = FirebaseOptions(
-    apiKey: 'AIzaSyAZ8bHRixieDYqvexQyrDmaCEPO8MGaiSE',
-    appId: '1:444951093704:web:98dfa2b4c99a04d8e6a0fd',
-    messagingSenderId: '444951093704',
-    projectId: 'world-of-iot-hub',
-    authDomain: 'world-of-iot-hub.firebaseapp.com',
-    databaseURL: 'https://world-of-iot-hub-default-rtdb.firebaseio.com',
-    storageBucket: 'world-of-iot-hub.firebasestorage.app',
+    apiKey: 'YOUR_FIREBASE_API_KEY',
+    appId: '1:1234567890:web:abcdef012345',
+    messagingSenderId: '1234567890',
+    projectId: 'your-firebase-project-id',
+    authDomain: 'your-firebase-project-id.firebaseapp.com',
+    databaseURL: 'https://your-firebase-project-id-default-rtdb.firebaseio.com',
+    storageBucket: 'your-firebase-project-id.firebasestorage.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAZ8bHRixieDYqvexQyrDmaCEPO8MGaiSE',
-    appId: '1:444951093704:web:98dfa2b4c99a04d8e6a0fd',
-    messagingSenderId: '444951093704',
-    projectId: 'world-of-iot-hub',
-    authDomain: 'world-of-iot-hub.firebaseapp.com',
-    databaseURL: 'https://world-of-iot-hub-default-rtdb.firebaseio.com',
-    storageBucket: 'world-of-iot-hub.firebasestorage.app',
+    apiKey: 'YOUR_FIREBASE_API_KEY',
+    appId: '1:1234567890:web:abcdef012345',
+    messagingSenderId: '1234567890',
+    projectId: 'your-firebase-project-id',
+    authDomain: 'your-firebase-project-id.firebaseapp.com',
+    databaseURL: 'https://your-firebase-project-id-default-rtdb.firebaseio.com',
+    storageBucket: 'your-firebase-project-id.firebasestorage.app',
   );
 }

@@ -1,14 +1,14 @@
 {
   "project_info": {
-    "project_number": "444951093704",
-    "firebase_url": "https://world-of-iot-hub-default-rtdb.firebaseio.com",
-    "project_id": "world-of-iot-hub",
-    "storage_bucket": "world-of-iot-hub.firebasestorage.app"
+    "project_number": "1234567890",
+    "firebase_url": "https://your-firebase-project-id-default-rtdb.firebaseio.com",
+    "project_id": "your-firebase-project-id",
+    "storage_bucket": "your-firebase-project-id.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:444951093704:android:2f1e5bd2896d82f6e6a0fd",
+        "mobilesdk_app_id": "1:1234567890:android:abcdef012345",
         "android_client_info": {
           "package_name": "com.example.world_of_iot"
         }
@@ -16,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCIq7EqH9feI9vBkhYJgZ8iAglty0_iuVI"
+          "current_key": "YOUR_FIREBASE_API_KEY"
         }
       ],
       "services": {
