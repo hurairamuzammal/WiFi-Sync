@@ -5,7 +5,7 @@
 [![Firebase](https://img.shields.io/badge/Firebase-Realtime_DB_%26_Auth-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Platform](https://img.shields.io/badge/Platform-Android_%7C_Linux-E95420?logo=linux&logoColor=white)](https://ubuntu.com)
-[![Version](https://img.shields.io/badge/Version-v2.1.0-8A2BE2)](#version--developer)
+[![Version](https://img.shields.io/badge/Version-v2.2.0-8A2BE2)](#version--developer)
 [![Access](https://img.shields.io/badge/Access-Private_Repository-critical)](#)
 
 > **Seamless real-time device hub & cross-platform clipboard synchronizer** bridging Android mobile devices and Linux desktop systems with sub-second latency via Firebase Realtime Database.

@@ -4,8 +4,8 @@ import '../services/clipboard_sync_manager.dart';
 import '../widgets/brand_logo_icon.dart';
 
 class DeveloperScreen extends StatelessWidget {
-  static const String appVersion = '2.1.0';
-  static const String appBuild = '210';
+  static const String appVersion = '2.2.0';
+  static const String appBuild = '220';
   static const String developerName = 'Muhammad Abu Huraira';
   static const String developerEmail = 'huraira.eqeel@gmail.com';
 
