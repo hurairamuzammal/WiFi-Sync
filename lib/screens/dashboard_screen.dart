@@ -358,7 +358,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const BrandLogoIcon(size: 30),
             const SizedBox(width: 10),
             const Text(
-              'World of IT',
+              'ClipSync',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
             ),
           ],

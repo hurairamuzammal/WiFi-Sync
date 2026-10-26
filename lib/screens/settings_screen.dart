@@ -199,7 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Row(
                               children: [
                                 Text(
-                                  'World of IT',
+                                  'ClipSync',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 15,

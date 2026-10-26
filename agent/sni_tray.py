@@ -157,7 +157,7 @@ class DBusMenuService(dbus.service.Object):
                 item(4, "Send Clipboard Now", enabled=True),
                 item(5, auto_txt, enabled=True),
                 item(6, sep=True),
-                item(7, "Open World of IT", enabled=True),
+                item(7, "Open ClipSync", enabled=True),
             ],
             signature="v",
         )
@@ -275,12 +275,12 @@ class StatusNotifierItemService(dbus.service.Object):
 
     def _title(self) -> str:
         if not self.state.get("is_connected", True):
-            return "World of IT · Offline"
+            return "ClipSync · Offline"
         if not self.state.get("auto_sync", True):
-            return "World of IT · Auto-Sync Off"
+            return "ClipSync · Auto-Sync Off"
         if self.state.get("both_synced", False):
-            return f"World of IT · Synced ({self.state.get('online_count', 2)} Online)"
-        return "World of IT · Ready"
+            return f"ClipSync · Synced ({self.state.get('online_count', 2)} Online)"
+        return "ClipSync · Ready"
 
     def refresh(self):
         self.NewIcon()
@@ -306,7 +306,7 @@ class StatusNotifierItemService(dbus.service.Object):
                     "Status": dbus.String("Active"),
                     "IconName": dbus.String(self._icon_name()),
                     "IconThemePath": dbus.String(self.icon_dir),
-                    "IconAccessibleDesc": dbus.String("World of IT Clipboard Sync"),
+                    "IconAccessibleDesc": dbus.String("ClipSync Clipboard Sync"),
                     "AttentionIconName": dbus.String("woi-clip-unread"),
                     "AttentionAccessibleDesc": dbus.String("New synced clipboard"),
                     "ItemIsMenu": dbus.Boolean(True),

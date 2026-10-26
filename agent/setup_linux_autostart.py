@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Generates and installs the systemd user service and XDG autostart desktop entry
-for the World of IT Linux Agent + Top Bar Indicator so it automatically launches
+for the ClipSync Linux Agent + Top Bar Indicator so it automatically launches
 on login/boot and reconnects whenever Wi-Fi is available.
 """
 
@@ -14,7 +14,7 @@ AGENT_SCRIPT = REPO_ROOT / "agent/agent.py"
 CONFIG_FILE = REPO_ROOT / "device_config.json"
 
 SERVICE_CONTENT = f"""[Unit]
-Description=World of IT Seamless Clipboard & Command Sync Agent
+Description=ClipSync Seamless Clipboard & Command Sync Agent
 After=network-online.target graphical-session.target
 Wants=network-online.target
 

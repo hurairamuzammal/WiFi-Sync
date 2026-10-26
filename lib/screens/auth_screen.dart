@@ -415,7 +415,7 @@ class _AuthScreenState extends State<AuthScreen>
                   const BrandLogoIcon(size: 72),
                   const SizedBox(height: 16),
                   Text(
-                    'World of IT',
+                    'ClipSync',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.4,

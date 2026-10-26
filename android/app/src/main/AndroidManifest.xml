@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
-        android:label="ClipPulse"
+        android:label="ClipSync"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -30,9 +30,9 @@
             </intent-filter>
         </activity>
 
-        <!-- ClipPulse Accessibility Service for instantaneous background clipboard capture -->
+        <!-- ClipSync Accessibility Service for instantaneous background clipboard capture -->
         <service
-            android:name=".ClipPulseAccessibilityService"
+            android:name=".ClipSyncAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="true">
             <intent-filter>
@@ -43,9 +43,9 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- ClipPulse Foreground Keep-Alive Service -->
+        <!-- ClipSync Foreground Keep-Alive Service -->
         <service
-            android:name=".ClipPulseForegroundService"
+            android:name=".ClipSyncForegroundService"
             android:foregroundServiceType="dataSync"
             android:exported="false" />
 

@@ -160,7 +160,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="World of IT API",
+    title="ClipSync API",
     version="1.0.0",
     description="Cross-platform device connectivity, remote actions, and clipboard synchronization API.",
     lifespan=lifespan,

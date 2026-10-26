@@ -12,20 +12,20 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 
 /**
- * Android Foreground Service for ClipPulse (World of IT).
+ * Android Foreground Service for ClipSync.
  *
  * Prevents Samsung One UI and Android Doze Mode from killing the background
  * WebSocket and SSE telemetry sync loops.
  */
-class ClipPulseForegroundService : Service() {
+class ClipSyncForegroundService : Service() {
 
     companion object {
-        const val CHANNEL_ID = "clippulse_sync_channel"
+        const val CHANNEL_ID = "clipsync_sync_channel"
         const val NOTIFICATION_ID = 2101
         var isRunning: Boolean = false
 
         fun start(context: Context) {
-            val intent = Intent(context, ClipPulseForegroundService::class.java)
+            val intent = Intent(context, ClipSyncForegroundService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
             } else {
@@ -34,7 +34,7 @@ class ClipPulseForegroundService : Service() {
         }
 
         fun stop(context: Context) {
-            val intent = Intent(context, ClipPulseForegroundService::class.java)
+            val intent = Intent(context, ClipSyncForegroundService::class.java)
             context.stopService(intent)
         }
     }
@@ -43,7 +43,7 @@ class ClipPulseForegroundService : Service() {
         super.onCreate()
         createNotificationChannel()
         val notification = buildNotification(
-            "ClipPulse Sync Active",
+            "ClipSync Active",
             "Real-time clipboard synchronization running with Linux"
         )
         startForeground(NOTIFICATION_ID, notification)

@@ -36,22 +36,22 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
                 "startForegroundSync" -> {
-                    ClipPulseForegroundService.start(this)
+                    ClipSyncForegroundService.start(this)
                     result.success(true)
                 }
                 "stopForegroundSync" -> {
-                    ClipPulseForegroundService.stop(this)
+                    ClipSyncForegroundService.stop(this)
                     result.success(true)
                 }
                 "isForegroundServiceRunning" -> {
-                    result.success(ClipPulseForegroundService.isRunning)
+                    result.success(ClipSyncForegroundService.isRunning)
                 }
                 else -> result.notImplemented()
             }
         }
 
         // Bridge accessibility clipboard events directly to Flutter
-        ClipPulseAccessibilityService.onClipboardChangedListener = { text ->
+        ClipSyncAccessibilityService.onClipboardChangedListener = { text ->
             runOnUiThread {
                 methodChannel?.invokeMethod("onClipboardChanged", mapOf("text" to text))
             }
@@ -59,13 +59,13 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {
-        val expectedServiceName = "${packageName}/${ClipPulseAccessibilityService::class.java.canonicalName}"
+        val expectedServiceName = "${packageName}/${ClipSyncAccessibilityService::class.java.canonicalName}"
         val enabledServices = Settings.Secure.getString(
             contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         ) ?: return false
         return enabledServices.contains(expectedServiceName) ||
-                enabledServices.contains(ClipPulseAccessibilityService::class.java.simpleName)
+                enabledServices.contains(ClipSyncAccessibilityService::class.java.simpleName)
     }
 
     private fun openAccessibilitySettings() {

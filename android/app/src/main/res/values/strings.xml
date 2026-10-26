@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ClipPulse</string>
-    <string name="accessibility_service_name">ClipPulse Instant Clipboard Sync</string>
-    <string name="accessibility_service_description">Enables ClipPulse (World of IT) to detect copied text across any app for sub-second background clipboard synchronization between your Samsung phone and Linux desktop.</string>
-    <string name="notification_channel_name">ClipPulse Background Sync</string>
+    <string name="app_name">ClipSync</string>
+    <string name="accessibility_service_name">ClipSync Instant Clipboard Sync</string>
+    <string name="accessibility_service_description">Enables ClipSync to detect copied text across any app for sub-second background clipboard synchronization between your Samsung phone and Linux desktop.</string>
+    <string name="notification_channel_name">ClipSync Background Sync</string>
     <string name="notification_channel_desc">Maintains real-time background sync connectivity with your paired devices.</string>
 </resources>

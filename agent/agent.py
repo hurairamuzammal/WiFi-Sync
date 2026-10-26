@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-World of IT: Linux Desktop Agent (V2 Seamless Edition)
+ClipSync: Linux Desktop Agent (V2 Seamless Edition)
 - Seamless 1s automatic clipboard watcher + manual push
 - Native Linux Top Bar / System Tray indicator icon with unread badge dot
 - Native desktop toast notification + subtle "dink" sound on incoming clipboard
@@ -58,7 +58,7 @@ def notify_desktop_clipboard(source_name: str, text: str):
                 [
                     "notify-send",
                     "-a",
-                    "World of IT",
+                    "ClipSync",
                     "-i",
                     "edit-paste",
                     "-t",
@@ -205,13 +205,13 @@ class LinuxTopBarTray:
             try:
                 self._icon.icon = self._create_image()
                 if not self.is_connected:
-                    status_txt = "World of IT: Offline / Waiting for Wi-Fi"
+                    status_txt = "ClipSync: Offline / Waiting for Wi-Fi"
                 elif not self.auto_sync:
-                    status_txt = "World of IT: Auto-Sync Paused"
+                    status_txt = "ClipSync: Auto-Sync Paused"
                 elif self.both_synced:
-                    status_txt = f"World of IT: Synced ({self.online_count} Online)"
+                    status_txt = f"ClipSync: Synced ({self.online_count} Online)"
                 else:
-                    status_txt = "World of IT: Waiting for Phone (1 Online)"
+                    status_txt = "ClipSync: Waiting for Phone (1 Online)"
                 self._icon.title = status_txt
                 self._icon.update_menu()
             except Exception:
@@ -332,13 +332,13 @@ class LinuxTopBarTray:
                     Item("Send Clipboard Now", on_click_push),
                     Item(auto_label, on_click_auto),
                     pystray.Menu.SEPARATOR,
-                    Item("Open World of IT", on_click_open),
+                    Item("Open ClipSync", on_click_open),
                 )
 
                 self._icon = pystray.Icon(
-                    "world_of_iot_tray",
+                    "clipsync_tray",
                     self._create_image(),
-                    "World of IT Sync",
+                    "ClipSync Sync",
                     menu,
                 )
                 logger.info("Fallback pystray top bar indicator initialized.")
@@ -406,7 +406,7 @@ class LocalClipboard:
 
 
 class DeviceAgent:
-    """Linux Device Agent for World of IT."""
+    """Linux Device Agent for ClipSync."""
 
     ALLOWLISTED_ACTIONS = {"shutdown", "restart", "sleep", "health_check"}
 
@@ -912,7 +912,7 @@ class DeviceAgent:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="World of IT Linux Desktop Agent")
+    parser = argparse.ArgumentParser(description="ClipSync Linux Desktop Agent")
     parser.add_argument("--config", default="device_config.json", help="Path to config file")
     parser.add_argument(
         "--firebase-url",

@@ -1,4 +1,4 @@
-# World of IT (World of IoT) 🌐⚡
+# ClipSync 🌐⚡
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
@@ -8,13 +8,13 @@
 [![Version](https://img.shields.io/badge/Version-v2.1.0-8A2BE2)](#version--developer)
 [![Access](https://img.shields.io/badge/Access-Private_Repository-critical)](#)
 
-> **Seamless real-time IoT device hub & cross-platform clipboard synchronizer** bridging Android mobile devices and Linux desktop systems with sub-second latency via Firebase Realtime Database.
+> **Seamless real-time device hub & cross-platform clipboard synchronizer** bridging Android mobile devices and Linux desktop systems with sub-second latency via Firebase Realtime Database.
 
 ---
 
 ## 🌟 Overview
 
-**World of IT** is an ecosystem designed to unify your mobile and desktop workflows. It seamlessly bridges Linux workstations (e.g. ThinkPad) with Android smartphones (e.g. Samsung Galaxy) through bidirectional, sub-second clipboard synchronization, peer presence tracking, remote device telemetry, and allowlisted device management commands.
+**ClipSync** is an ecosystem designed to unify your mobile and desktop workflows. It seamlessly bridges Linux workstations (e.g. ThinkPad) with Android smartphones (e.g. Samsung Galaxy) through bidirectional, sub-second clipboard synchronization, peer presence tracking, remote device telemetry, and allowlisted device management commands.
 
 Built with a **Flutter cross-platform client**, a lightweight **Python background daemon** (`agent.py`) with a native desktop tray indicator (`sni_tray.py`), and backed by **Firebase Realtime Database (RTDB)** and **Firebase Auth**.
 
@@ -30,7 +30,7 @@ Built with a **Flutter cross-platform client**, a lightweight **Python backgroun
 - **🐧 Native Linux Desktop Integration**
   - Lightweight Python daemon (`agent/agent.py`) running seamlessly as a `systemd` user service (`world-of-iot-agent.service`).
   - Desktop status tray (`sni_tray.py`) with dynamic monochrome clipboard icon and peer online/offline indicators.
-  - One-click tray actions: *Sync Clipboard Now*, *Open World of IT*, *Toggle Auto-Sync*, and *Restart Agent*.
+  - One-click tray actions: *Sync Clipboard Now*, *Open ClipSync*, *Toggle Auto-Sync*, and *Restart Agent*.
 
 - **📱 Smart Peer Device Filtering**
   - Automatic peer device isolation: Each device monitors and displays the status of paired peer devices without self-referential clutter.
@@ -194,7 +194,7 @@ systemctl --user status world-of-iot-agent.service
 
 ## 🧪 Testing & Verification
 
-World of IT includes an end-to-end verification harness ensuring code quality, security rules integrity, and platform compatibility.
+ClipSync includes an end-to-end verification harness ensuring code quality, security rules integrity, and platform compatibility.
 
 Run the full verification suite:
 

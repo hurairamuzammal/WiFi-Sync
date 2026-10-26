@@ -7,16 +7,16 @@ import android.content.Context
 import android.view.accessibility.AccessibilityEvent
 
 /**
- * Android Accessibility Service for ClipPulse (World of IT).
+ * Android Accessibility Service for ClipSync.
  *
  * Exemption from Android 10+ background clipboard restrictions:
  * Allows detecting clipboard copy events instantly across all third-party apps
- * without requiring the World of IT app to be focused or in foreground.
+ * without requiring the ClipSync app to be focused or in foreground.
  */
-class ClipPulseAccessibilityService : AccessibilityService() {
+class ClipSyncAccessibilityService : AccessibilityService() {
 
     companion object {
-        var instance: ClipPulseAccessibilityService? = null
+        var instance: ClipSyncAccessibilityService? = null
         var lastSyncedText: String? = null
         var onClipboardChangedListener: ((String) -> Unit)? = null
 

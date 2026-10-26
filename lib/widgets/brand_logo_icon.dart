@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Minimal flat Nordic-pastel brand icon for World of IT.
+/// Minimal flat Nordic-pastel brand icon for ClipSync.
 /// Matches `assets/icons/app_icon.png` via crisp native vector rendering:
 /// soft pastel lavender squircle (#EBE7F8), clean white clipboard card,
 /// muted slate-plum (#463E66) refined stroke, and soft pastel mint (#A6E1C8) accents.
