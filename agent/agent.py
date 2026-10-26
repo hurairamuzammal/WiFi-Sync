@@ -439,7 +439,9 @@ class DeviceAgent:
         return new_val
 
     def _launch_desktop_app(self):
-        bundle_bin = self.repo_root / "build/linux/x64/debug/bundle/world_of_iot"
+        release_bin = self.repo_root / "build/linux/x64/release/bundle/world_of_iot"
+        debug_bin = self.repo_root / "build/linux/x64/debug/bundle/world_of_iot"
+        bundle_bin = release_bin if release_bin.exists() else debug_bin
         if bundle_bin.exists():
             subprocess.Popen([str(bundle_bin)], cwd=str(self.repo_root))
 
