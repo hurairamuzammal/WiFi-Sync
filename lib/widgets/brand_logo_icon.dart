@@ -1,9 +1,9 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-/// Minimal flat Nordic-pastel brand icon for ClipSync.
-/// Matches `assets/icons/app_icon.png` via crisp native vector rendering:
-/// soft pastel lavender squircle (#EBE7F8), clean white clipboard card,
-/// muted slate-plum (#463E66) refined stroke, and soft pastel mint (#A6E1C8) accents.
+/// Minimal monochrome WiFi brand icon for WiFi Sync.
+/// Sleek obsidian squircle (#18181B) with crisp pure white WiFi arcs
+/// and central broadcast dot, designed for pixel-perfect scaling across all sizes.
 class BrandLogoIcon extends StatelessWidget {
   final double size;
   final bool showBadge;
@@ -16,107 +16,76 @@ class BrandLogoIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = size * 0.24;
+    final radius = size * 0.22;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: const Color(0xFFEBE7F8),
+        color: const Color(0xFF18181B),
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: const Color(0xFFDDD7F0),
-          width: 1.0,
+          color: const Color(0xFF3F3F46),
+          width: (size * 0.02).clamp(1.0, 2.0),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0x2E000000),
+            blurRadius: size * 0.1,
+            offset: Offset(0, size * 0.04),
+          ),
+        ],
       ),
-      child: CustomPaint(
-        painter: _MinimalPastelClipboardPainter(showBadge: showBadge),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: CustomPaint(
+          painter: _MonochromeWiFiPainter(showBadge: showBadge),
+        ),
       ),
     );
   }
 }
 
-class _MinimalPastelClipboardPainter extends CustomPainter {
+class _MonochromeWiFiPainter extends CustomPainter {
   final bool showBadge;
 
-  const _MinimalPastelClipboardPainter({this.showBadge = false});
+  const _MonochromeWiFiPainter({this.showBadge = false});
 
   @override
   void paint(Canvas canvas, Size size) {
     final s = size.width;
-    final cx = s / 2;
-    final cy = s / 2;
+    final cx = s / 2.0;
+    final cy = s * 0.65;
 
-    const inkPlum = Color(0xFF463E66);
-    const pastelMint = Color(0xFFA6E1C8);
-    const pastelIris = Color(0xFFC4BCEA);
+    final strokeW = (s * 0.065).clamp(1.8, 6.5);
+    final dotR = (s * 0.068).clamp(2.0, 6.8);
 
-    final boardW = s * 0.44;
-    final boardH = s * 0.54;
-    final boardR = s * 0.095;
-    final strokeW = (s * 0.028).clamp(1.5, 6.0);
-
-    final bx0 = cx - boardW / 2;
-    final by0 = cy - boardH / 2 + s * 0.03;
-    final boardRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(bx0, by0, boardW, boardH),
-      Radius.circular(boardR),
-    );
-
-    final fillWhite = Paint()
-      ..color = Colors.white
+    // Center broadcast dot
+    final dotPaint = Paint()
+      ..color = showBadge ? const Color(0xFF34C77B) : Colors.white
       ..style = PaintingStyle.fill;
-    final strokePaint = Paint()
-      ..color = inkPlum
+    canvas.drawCircle(Offset(cx, cy), dotR, dotPaint);
+
+    // WiFi waves (pure monochrome white)
+    final wavePaint = Paint()
+      ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeW
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    canvas.drawRRect(boardRect, fillWhite);
-    canvas.drawRRect(boardRect, strokePaint);
+    // Symmetric 86 degree sweep centered around vertical top (-pi / 2)
+    const sweepAngle = 86.0 * math.pi / 180.0;
+    final startAngle = -math.pi / 2.0 - (sweepAngle / 2.0);
 
-    // Top pastel-mint clip pill
-    final clipW = boardW * 0.46;
-    final clipH = boardH * 0.19;
-    final clipRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(cx - clipW / 2, by0 - clipH * 0.48, clipW, clipH),
-      Radius.circular(clipH / 2),
-    );
-    canvas.drawRRect(clipRect, Paint()..color = pastelMint);
-    canvas.drawRRect(clipRect, strokePaint);
+    final radii = [s * 0.18, s * 0.31, s * 0.44];
 
-    // Minimal pastel horizontal pills inside
-    final lineH = (s * 0.038).clamp(1.6, 8.0);
-    final padX = boardW * 0.23;
-    final lx0 = bx0 + padX;
-
-    final ly1 = by0 + boardH * 0.43;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(lx0, ly1, boardW - padX * 2, lineH),
-        Radius.circular(lineH / 2),
-      ),
-      Paint()..color = pastelIris,
-    );
-
-    final ly2 = by0 + boardH * 0.62;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(lx0, ly2, boardW * 0.35, lineH),
-        Radius.circular(lineH / 2),
-      ),
-      Paint()..color = pastelMint,
-    );
-
-    final dotR = lineH * 0.52;
-    canvas.drawCircle(
-      Offset(bx0 + boardW - padX - dotR, ly2 + lineH / 2),
-      dotR,
-      Paint()..color = showBadge ? const Color(0xFF34C77B) : inkPlum,
-    );
+    for (final r in radii) {
+      final rect = Rect.fromCircle(center: Offset(cx, cy), radius: r);
+      canvas.drawArc(rect, startAngle, sweepAngle, false, wavePaint);
+    }
   }
 
   @override
-  bool shouldRepaint(covariant _MinimalPastelClipboardPainter oldDelegate) =>
+  bool shouldRepaint(covariant _MonochromeWiFiPainter oldDelegate) =>
       oldDelegate.showBadge != showBadge;
 }

@@ -1,4 +1,4 @@
-# Privacy Policy for ClipSync
+# Privacy Policy for WiFi Sync
 
 **Effective Date:** October 26, 2026  
 **Last Updated:** October 26, 2026  
@@ -9,8 +9,8 @@
 
 ## 1. Core Principle: Bring Your Own Cloud & Zero Intermediaries
 
-ClipSync is built on an absolute **self-hosted, user-owned architecture**.
-- ClipSync connects directly and exclusively to the user's personal Firebase Realtime Database or private server.
+WiFi Sync is built on an absolute **self-hosted, user-owned architecture**.
+- WiFi Sync connects directly and exclusively to the user's personal Firebase Realtime Database or private server.
 - The developer (Muhammad Abu Huraira) and any third-party providers have **zero access, zero visibility, and zero interception capabilities** over your database, your authentication tokens, or your clipboard contents.
 - There are no intermediary proxy servers, telemetry collectors, or central databases.
 
@@ -30,13 +30,13 @@ ClipSync is built on an absolute **self-hosted, user-owned architecture**.
 ### C. Authentication Credentials
 - **What is collected:** User email and password hash.
 - **Purpose:** Authenticating access to your private Firebase database.
-- **Handling:** Authentication is managed directly by Google Firebase Authentication. Password hashes are never accessible to ClipSync or its developers.
+- **Handling:** Authentication is managed directly by Google Firebase Authentication. Password hashes are never accessible to WiFi Sync or its developers.
 
 ---
 
 ## 3. Zero Third-Party Tracking & Zero Monetization
 
-ClipSync does **NOT**:
+WiFi Sync does **NOT**:
 - Include advertising SDKs or banner ads.
 - Include analytics trackers (e.g., Google Analytics, Facebook Pixel, Mixpanel, AppsFlyer).
 - Track device locations, GPS coordinates, or IP geolocation.
@@ -46,7 +46,7 @@ ClipSync does **NOT**:
 
 ## 4. Encryption & Security Standards
 
-- **TLS 1.3 Transport Security:** All network communications between ClipSync and Firebase are strictly encrypted using HTTPS / WSS with TLS 1.3.
+- **TLS 1.3 Transport Security:** All network communications between WiFi Sync and Firebase are strictly encrypted using HTTPS / WSS with TLS 1.3.
 - **Local Credentials:** Auth tokens and session identifiers are stored using platform-native secure storage or sandboxed application preferences.
 - **Restricted Access:** Firebase security rules (`database.rules.json`) ensure only authenticated sessions matching the owner's UID can read or write data.
 
@@ -66,7 +66,7 @@ Under the European Union GDPR (Articles 15 through 22) and California CCPA / CPR
 
 ## 6. Children's Online Privacy Protection (COPPA)
 
-ClipSync is intended for general developer and productivity use and does not knowingly collect or solicit personal information from children under the age of 13.
+WiFi Sync is intended for general developer and productivity use and does not knowingly collect or solicit personal information from children under the age of 13.
 
 ---
 
@@ -77,4 +77,4 @@ For privacy questions, compliance verification, or inquiries:
 - **Data Protection Officer / Lead Developer:** Muhammad Abu Huraira
 - **Email:** `huraira.eqeel@gmail.com`
 - **Location:** Lahore, Punjab, Pakistan
-- **Repository Issues:** [github.com/hurairamuzammal/world_of_iot/issues](https://github.com/hurairamuzammal/world_of_iot/issues)
+- **Repository Issues:** [github.com/hurairamuzammal/WiFi-Sync/issues](https://github.com/hurairamuzammal/WiFi-Sync/issues)

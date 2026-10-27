@@ -1,4 +1,4 @@
-// Template Firebase Options for ClipSync.
+// Template Firebase Options for WiFi Sync.
 // Connect your own free Firebase project by replacing the placeholders below
 // or by entering your credentials directly in the in-app Firebase Setup screen.
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;

@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
-        android:label="ClipSync"
+        android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -30,9 +30,9 @@
             </intent-filter>
         </activity>
 
-        <!-- ClipSync Accessibility Service for instantaneous background clipboard capture -->
+        <!-- WiFi Sync Accessibility Service for instantaneous background clipboard capture -->
         <service
-            android:name=".ClipSyncAccessibilityService"
+            android:name=".WiFiSyncAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="true">
             <intent-filter>
@@ -43,15 +43,15 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
-        <!-- ClipSync Foreground Keep-Alive Service -->
+        <!-- WiFi Sync Foreground Keep-Alive Service -->
         <service
-            android:name=".ClipSyncForegroundService"
+            android:name=".WiFiSyncForegroundService"
             android:foregroundServiceType="dataSync"
             android:exported="false" />
 
-        <!-- ClipSync Quick Notification Action Receiver -->
+        <!-- WiFi Sync Quick Notification Action Receiver -->
         <receiver
-            android:name=".ClipSyncActionReceiver"
+            android:name=".WiFiSyncActionReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.example.world_of_iot.ACTION_SYNC_CLIPBOARD" />

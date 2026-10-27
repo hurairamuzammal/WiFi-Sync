@@ -461,7 +461,7 @@ class _AuthScreenState extends State<AuthScreen>
                     controller: projController,
                     decoration: const InputDecoration(
                       labelText: 'Firebase Project ID',
-                      hintText: 'e.g. my-clipsync-hub',
+                      hintText: 'e.g. my-wifisync-hub',
                       isDense: true,
                       prefixIcon: Icon(Icons.folder_outlined, size: 20),
                     ),
@@ -682,7 +682,7 @@ class _AuthScreenState extends State<AuthScreen>
                   const BrandLogoIcon(size: 72),
                   const SizedBox(height: 16),
                   Text(
-                    'ClipSync',
+                    'WiFi Sync',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.4,

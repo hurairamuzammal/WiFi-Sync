@@ -12,21 +12,21 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 
 /**
- * Android Foreground Service for ClipSync.
+ * Android Foreground Service for WiFi Sync.
  *
  * Keeps real-time socket and event listeners active in the background.
  * Provides a persistent status notification with a direct "Send to Laptop"
  * action button so users can instantly sync text without opening the app window.
  */
-class ClipSyncForegroundService : Service() {
+class WiFiSyncForegroundService : Service() {
 
     companion object {
-        const val CHANNEL_ID = "clipsync_sync_channel"
+        const val CHANNEL_ID = "wifisync_sync_channel"
         const val NOTIFICATION_ID = 2101
         var isRunning: Boolean = false
 
         fun start(context: Context) {
-            val intent = Intent(context, ClipSyncForegroundService::class.java)
+            val intent = Intent(context, WiFiSyncForegroundService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
             } else {
@@ -35,7 +35,7 @@ class ClipSyncForegroundService : Service() {
         }
 
         fun stop(context: Context) {
-            val intent = Intent(context, ClipSyncForegroundService::class.java)
+            val intent = Intent(context, WiFiSyncForegroundService::class.java)
             context.stopService(intent)
         }
     }
@@ -44,7 +44,7 @@ class ClipSyncForegroundService : Service() {
         super.onCreate()
         createNotificationChannel()
         val notification = buildNotification(
-            "ClipSync Active",
+            "WiFi Sync Active",
             "Real-time clipboard synchronization running with Linux"
         )
         startForeground(NOTIFICATION_ID, notification)
@@ -95,8 +95,8 @@ class ClipSyncForegroundService : Service() {
         )
 
         // Action button: "Send to Laptop"
-        val syncIntent = Intent(this, ClipSyncActionReceiver::class.java).apply {
-            action = ClipSyncActionReceiver.ACTION_SYNC_CLIPBOARD
+        val syncIntent = Intent(this, WiFiSyncActionReceiver::class.java).apply {
+            action = WiFiSyncActionReceiver.ACTION_SYNC_CLIPBOARD
         }
         val pendingSync = PendingIntent.getBroadcast(
             this,

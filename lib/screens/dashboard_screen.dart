@@ -358,7 +358,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const BrandLogoIcon(size: 30),
             const SizedBox(width: 10),
             const Text(
-              'ClipSync',
+              'WiFi Sync',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
             ),
           ],

@@ -111,12 +111,12 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
   Widget _buildFaqTab(ThemeData theme) {
     final faqs = [
       {
-        'q': 'What is ClipSync?',
-        'a': 'ClipSync is a cross-platform, private clipboard synchronization utility for Android, Linux, and Windows. It allows text copied on one device to appear immediately on your other connected devices.'
+        'q': 'What is WiFi Sync?',
+        'a': 'WiFi Sync is a cross-platform, private clipboard synchronization utility for Android, Linux, and Windows. It allows text copied on one device to appear immediately on your other connected devices.'
       },
       {
         'q': 'Is my clipboard data private and secure?',
-        'a': 'Yes, completely. ClipSync connects exclusively to your own private Firebase Realtime Database project. No third-party servers, developer servers, or advertising networks ever intercept, read, monetize, or store your clipboard content. All communication is encrypted in transit using TLS 1.3.'
+        'a': 'Yes, completely. WiFi Sync connects exclusively to your own private Firebase Realtime Database project. No third-party servers, developer servers, or advertising networks ever intercept, read, monetize, or store your clipboard content. All communication is encrypted in transit using TLS 1.3.'
       },
       {
         'q': 'Why do I connect my own Firebase project?',
@@ -128,11 +128,11 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
       },
       {
         'q': 'How do I pause syncing when copying sensitive passwords?',
-        'a': 'You can turn off the "Clipboard Sync" switch located directly at the top of the Dashboard or in Settings. While turned off, ClipSync completely stops watching your clipboard and suspends the background service.'
+        'a': 'You can turn off the "Clipboard Sync" switch located directly at the top of the Dashboard or in Settings. While turned off, WiFi Sync completely stops watching your clipboard and suspends the background service.'
       },
       {
         'q': 'How does Android background syncing work on Samsung One UI?',
-        'a': 'Android 10+ restricts background apps from reading the clipboard. ClipSync uses an Accessibility Service copy detector to capture copy events, along with an ongoing notification offering a quick "Send to Laptop" action.'
+        'a': 'Android 10+ restricts background apps from reading the clipboard. WiFi Sync uses an Accessibility Service copy detector to capture copy events, along with an ongoing notification offering a quick "Send to Laptop" action.'
       },
       {
         'q': 'How do I delete all my stored clipboard history or my account?',
@@ -140,7 +140,7 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
       },
       {
         'q': 'Which platforms are supported?',
-        'a': 'ClipSync officially supports Android (10+), Linux (x86_64 desktop with GNOME, KDE, or XFCE), and Windows (10/11 x86_64). macOS, iOS, and Web builds are also supported.'
+        'a': 'WiFi Sync officially supports Android (10+), Linux (x86_64 desktop with GNOME, KDE, or XFCE), and Windows (10/11 x86_64). macOS, iOS, and Web builds are also supported.'
       },
     ];
 
@@ -215,7 +215,7 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
           const SizedBox(height: 16),
           _policySection(
             '1. Overview & Data Ownership',
-            'ClipSync is built on a bring-your-own-cloud architecture. All data transmitted through ClipSync resides solely in the user\'s private Firebase project or local device storage. The developers of ClipSync have zero access to your database, your authentication tokens, or your clipboard content.',
+            'WiFi Sync is built on a bring-your-own-cloud architecture. All data transmitted through WiFi Sync resides solely in the user\'s private Firebase project or local device storage. The developers of WiFi Sync have zero access to your database, your authentication tokens, or your clipboard content.',
           ),
           _policySection(
             '2. Data We Process',
@@ -225,7 +225,7 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
           ),
           _policySection(
             '3. Zero Third-Party Tracking & Zero Monetization',
-            'ClipSync contains NO advertising SDKs, NO analytics tracking, NO fingerprinting libraries, and NO data brokering. Your data is never sold, leased, or shared with third parties.',
+            'WiFi Sync contains NO advertising SDKs, NO analytics tracking, NO fingerprinting libraries, and NO data brokering. Your data is never sold, leased, or shared with third parties.',
           ),
           _policySection(
             '4. Security & Encryption in Transit',
@@ -240,7 +240,7 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
           ),
           _policySection(
             '6. Children\'s Privacy (COPPA)',
-            'ClipSync is a developer and productivity tool not directed toward children under 13. We do not knowingly collect personal information from children.',
+            'WiFi Sync is a developer and productivity tool not directed toward children under 13. We do not knowingly collect personal information from children.',
           ),
           _policySection(
             '7. Contact Data Protection Officer',
@@ -268,13 +268,13 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
           ),
           const SizedBox(height: 6),
           Text(
-            'Effective upon downloading or launching ClipSync',
+            'Effective upon downloading or launching WiFi Sync',
             style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 16),
           _policySection(
             '1. License Grant',
-            'ClipSync is distributed under the MIT License. You are granted permission to use, study, modify, and distribute the software for personal or commercial purposes, subject to preserving copyright notices.',
+            'WiFi Sync is distributed under the MIT License. You are granted permission to use, study, modify, and distribute the software for personal or commercial purposes, subject to preserving copyright notices.',
           ),
           _policySection(
             '2. Disclaimer of Warranties ("AS IS")',
@@ -286,7 +286,7 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
           ),
           _policySection(
             '4. User Responsibility for Sensitive Data',
-            'Clipboard text may inadvertently contain sensitive items such as passwords, multi-factor codes, API keys, or financial credentials. Users are strongly advised to pause ClipSync or use the master switch when manipulating high-security credentials.',
+            'Clipboard text may inadvertently contain sensitive items such as passwords, multi-factor codes, API keys, or financial credentials. Users are strongly advised to pause WiFi Sync or use the master switch when manipulating high-security credentials.',
           ),
           _policySection(
             '5. Third-Party Cloud Services',
@@ -345,7 +345,7 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
                     title: const Text('Email Support'),
                     subtitle: const Text('huraira.eqeel@gmail.com'),
                     trailing: TextButton(
-                      onPressed: () => _launchUrl('mailto:huraira.eqeel@gmail.com?subject=ClipSync%20Inquiry'),
+                      onPressed: () => _launchUrl('mailto:huraira.eqeel@gmail.com?subject=WiFiSync%20Inquiry'),
                       child: const Text('Compose'),
                     ),
                   ),
@@ -388,7 +388,7 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
-                      'ClipSync is 100% free software. If you enjoy it or have suggestions for new features, star the repository on GitHub!',
+                      'WiFi Sync is 100% free software. If you enjoy it or have suggestions for new features, star the repository on GitHub!',
                       style: TextStyle(fontSize: 12.5),
                     ),
                   ),
@@ -426,7 +426,7 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
             theme,
             step: 1,
             title: 'Open Firebase Console',
-            body: 'Navigate to console.firebase.google.com and sign in with any Google account. Click "Add project" and name it (e.g. "my-clipsync").',
+            body: 'Navigate to console.firebase.google.com and sign in with any Google account. Click "Add project" and name it (e.g. "my-wifisync").',
             buttonLabel: 'Copy Link',
             buttonAction: () => _launchUrl('https://console.firebase.google.com'),
           ),
@@ -451,8 +451,8 @@ class _LegalAndFaqScreenState extends State<LegalAndFaqScreen>
           _guideStep(
             theme,
             step: 5,
-            title: 'Paste into ClipSync Settings',
-            body: 'In ClipSync, go to Settings > Cloud & Firebase > Configure Firebase Project. Paste your keys and click "Save & Apply". You are now syncing on your own private cloud!',
+            title: 'Paste into WiFi Sync Settings',
+            body: 'In WiFi Sync, go to Settings > Cloud & Firebase > Configure Firebase Project. Paste your keys and click "Save & Apply". You are now syncing on your own private cloud!',
           ),
         ],
       ),

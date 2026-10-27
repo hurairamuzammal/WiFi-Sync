@@ -1,9 +1,9 @@
-# ClipSync 🌐⚡
+# WiFi Sync 🌐⚡
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Realtime_DB_%26_Auth-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
-[![Platform](https://img.shields.io/badge/Platform-Android_%7C_Linux_%7C_Windows-E95420?logo=linux&logoColor=white)](https://github.com/hurairamuzammal/world_of_iot)
+[![Platform](https://img.shields.io/badge/Platform-Android_%7C_Linux_%7C_Windows-E95420?logo=linux&logoColor=white)](https://github.com/hurairamuzammal/WiFi-Sync)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-v2.2.0-8A2BE2)](#version--developer)
 [![Access](https://img.shields.io/badge/Access-Private_Repository-critical)](#)
@@ -58,7 +58,7 @@
             v                                           v
 +-----------------------+ +-----------------------+ +-----------------------+
 |  Android Smartphone   | |     Linux Desktop     | |    Windows Desktop    |
-| - ClipSync Flutter    | | - ClipSync Flutter    | | - ClipSync Flutter    |
+| - WiFi Sync Flutter    | | - WiFi Sync Flutter    | | - WiFi Sync Flutter    |
 | - Accessibility Svc   | | - GTK Clipboard Sync  | | - Win32 Clipboard Sync|
 | - Ongoing Shade Action| | - System Presence     | | - System Presence     |
 | - Samsung Pill Toasts | | - Fast Heartbeats     | | - Fast Heartbeats     |
@@ -126,7 +126,7 @@ flutter run -d windows
 ```
 
 ### 3. Connect Cloud in the App
-When you open ClipSync, tap **Connect** on the cloud strip, paste your **Project ID** and **Web API Key**, and tap **Save & Apply**. You are now securely syncing across your devices!
+When you open WiFi Sync, tap **Connect** on the cloud strip, paste your **Project ID** and **Web API Key**, and tap **Save & Apply**. You are now securely syncing across your devices!
 
 ---
 
@@ -146,7 +146,7 @@ flutter analyze
 
 ## ⚖️ Legal & Privacy Compliance
 
-ClipSync complies with global software distribution regulations:
+WiFi Sync complies with global software distribution regulations:
 - **Privacy Policy:** [PRIVACY.md](PRIVACY.md)
 - **Terms of Service:** [TERMS.md](TERMS.md)
 - **Support & Inquiries:** [SUPPORT.md](SUPPORT.md)

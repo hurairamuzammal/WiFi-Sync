@@ -18,7 +18,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify title and subtitle
-    expect(find.text('ClipSync'), findsOneWidget);
+    expect(find.text('WiFi Sync'), findsOneWidget);
     expect(find.text('Cross-Device Remote Actions & Clipboard Sync'),
         findsOneWidget);
 

@@ -156,7 +156,7 @@ class WorldOfItApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ClipSync',
+      title: 'WiFi Sync',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
       theme: _buildLightTheme(),

@@ -13,7 +13,7 @@ import android.widget.Toast
  * Allows instantaneous user-initiated clipboard dispatch on Android 10+
  * directly from the system notification bar without opening the app window.
  */
-class ClipSyncActionReceiver : BroadcastReceiver() {
+class WiFiSyncActionReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTION_SYNC_CLIPBOARD) {
@@ -22,18 +22,18 @@ class ClipSyncActionReceiver : BroadcastReceiver() {
             if (clip != null && clip.itemCount > 0) {
                 val text = clip.getItemAt(0)?.coerceToText(context)?.toString()?.trim()
                 if (!text.isNullOrEmpty()) {
-                    ClipSyncAccessibilityService.notifyTextCopied(text)
+                    WiFiSyncAccessibilityService.notifyTextCopied(text)
                     Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(context, "ClipSync: Sent to laptop", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "WiFi Sync: Sent to laptop", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(context, "ClipSync: Clipboard is empty", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "WiFi Sync: Clipboard is empty", Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
                 Handler(Looper.getMainLooper()).post {
-                    Toast.makeText(context, "ClipSync: Clipboard is empty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "WiFi Sync: Clipboard is empty", Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -1,12 +1,12 @@
-# Frequently Asked Questions (FAQ) - ClipSync
+# Frequently Asked Questions (FAQ) - WiFi Sync
 
-### 1. What is ClipSync?
-ClipSync is a high-performance, cross-platform clipboard synchronization and device management application for Android, Linux, and Windows (with iOS, macOS, and Web support). It lets text copied on one device appear instantaneously on your other devices.
+### 1. What is WiFi Sync?
+WiFi Sync is a high-performance, cross-platform clipboard synchronization and device management application for Android, Linux, and Windows (with iOS, macOS, and Web support). It lets text copied on one device appear instantaneously on your other devices.
 
 ---
 
 ### 2. Is my clipboard data private? Can the developer see my text?
-**No.** ClipSync connects exclusively to your personal Firebase Realtime Database. The developer (Muhammad Abu Huraira) has zero servers, zero telemetry endpoints, and zero access to your database. Your clipboard text is encrypted in transit using TLS 1.3 and stored only in your private database.
+**No.** WiFi Sync connects exclusively to your personal Firebase Realtime Database. The developer (Muhammad Abu Huraira) has zero servers, zero telemetry endpoints, and zero access to your database. Your clipboard text is encrypted in transit using TLS 1.3 and stored only in your private database.
 
 ---
 
@@ -33,9 +33,9 @@ You can flip the master **"Clipboard Sync"** switch located at the top of the Da
 
 ### 6. How does Android background syncing work on Samsung One UI?
 Due to Android 10+ background clipboard restrictions:
-1. **Accessibility Copy Detector:** Captures copy actions across third-party apps even when ClipSync is minimized.
+1. **Accessibility Copy Detector:** Captures copy actions across third-party apps even when WiFi Sync is minimized.
 2. **Notification Quick Action:** The persistent notification shade includes a "Send to Laptop" quick action button for foreground-privileged instant synchronization.
-3. **Focus Auto-Push:** Whenever ClipSync resumes focus, any newly copied text is synchronized immediately.
+3. **Focus Auto-Push:** Whenever WiFi Sync resumes focus, any newly copied text is synchronized immediately.
 
 ---
 
@@ -47,4 +47,4 @@ Go to **Settings > Data Management & Privacy Rights**:
 ---
 
 ### 8. How do I report bugs or suggest features?
-Open an issue on GitHub: [github.com/hurairamuzammal/world_of_iot/issues](https://github.com/hurairamuzammal/world_of_iot/issues) or email Muhammad Abu Huraira at `huraira.eqeel@gmail.com`.
+Open an issue on GitHub: [github.com/hurairamuzammal/WiFi-Sync/issues](https://github.com/hurairamuzammal/WiFi-Sync/issues) or email Muhammad Abu Huraira at `huraira.eqeel@gmail.com`.

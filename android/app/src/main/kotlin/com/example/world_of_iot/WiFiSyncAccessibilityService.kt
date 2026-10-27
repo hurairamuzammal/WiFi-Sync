@@ -8,7 +8,7 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 
 /**
- * Android Accessibility Service for ClipSync.
+ * Android Accessibility Service for WiFi Sync.
  *
  * Provides real-time background clipboard detection across third-party apps:
  * 1. Tracks text selection ranges to capture candidate text before copy commands
@@ -16,10 +16,10 @@ import android.view.accessibility.AccessibilityNodeInfo
  * 3. Catches Copy actions in context menus and toolbars
  * 4. Dispatches text directly to Flutter via MethodChannel bridge
  */
-class ClipSyncAccessibilityService : AccessibilityService() {
+class WiFiSyncAccessibilityService : AccessibilityService() {
 
     companion object {
-        var instance: ClipSyncAccessibilityService? = null
+        var instance: WiFiSyncAccessibilityService? = null
         var lastSyncedText: String? = null
         var lastCapturedSelection: String? = null
         var onClipboardChangedListener: ((String) -> Unit)? = null

@@ -36,22 +36,22 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
                 "startForegroundSync" -> {
-                    ClipSyncForegroundService.start(this)
+                    WiFiSyncForegroundService.start(this)
                     result.success(true)
                 }
                 "stopForegroundSync" -> {
-                    ClipSyncForegroundService.stop(this)
+                    WiFiSyncForegroundService.stop(this)
                     result.success(true)
                 }
                 "isForegroundServiceRunning" -> {
-                    result.success(ClipSyncForegroundService.isRunning)
+                    result.success(WiFiSyncForegroundService.isRunning)
                 }
                 else -> result.notImplemented()
             }
         }
 
         // Bridge accessibility clipboard events directly to Flutter
-        ClipSyncAccessibilityService.onClipboardChangedListener = { text ->
+        WiFiSyncAccessibilityService.onClipboardChangedListener = { text ->
             runOnUiThread {
                 methodChannel?.invokeMethod("onClipboardChanged", mapOf("text" to text))
             }
@@ -59,13 +59,13 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {
-        val expectedServiceName = "${packageName}/${ClipSyncAccessibilityService::class.java.canonicalName}"
+        val expectedServiceName = "${packageName}/${WiFiSyncAccessibilityService::class.java.canonicalName}"
         val enabledServices = Settings.Secure.getString(
             contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         ) ?: return false
         return enabledServices.contains(expectedServiceName) ||
-                enabledServices.contains(ClipSyncAccessibilityService::class.java.simpleName)
+                enabledServices.contains(WiFiSyncAccessibilityService::class.java.simpleName)
     }
 
     private fun openAccessibilitySettings() {

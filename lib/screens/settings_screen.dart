@@ -274,7 +274,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     controller: projController,
                     decoration: const InputDecoration(
                       labelText: 'Firebase Project ID',
-                      hintText: 'e.g. my-clipsync-free',
+                      hintText: 'e.g. my-wifisync-free',
                       isDense: true,
                       prefixIcon: Icon(Icons.folder_outlined, size: 20),
                     ),
@@ -533,7 +533,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Row(
                               children: [
                                 Text(
-                                  'ClipSync',
+                                  'WiFi Sync',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 15,

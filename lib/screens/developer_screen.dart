@@ -49,7 +49,7 @@ class DeveloperScreen extends StatelessWidget {
                     const BrandLogoIcon(size: 72),
                     const SizedBox(height: 14),
                     Text(
-                      'ClipSync',
+                      'WiFi Sync',
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.3,

@@ -2,20 +2,20 @@
 
 **Effective Date:** October 26, 2026  
 **License:** MIT License  
-**Product:** ClipSync (Cross-Platform Clipboard & Device Synchronization)  
+**Product:** WiFi Sync (Cross-Platform Clipboard & Device Synchronization)  
 **Developer:** Muhammad Abu Huraira (`huraira.eqeel@gmail.com`)
 
 ---
 
 ## 1. Acceptance of Terms
 
-By downloading, installing, compiling, or executing ClipSync, you agree to be bound by these Terms of Service. If you do not agree to these terms, do not install or use the software.
+By downloading, installing, compiling, or executing WiFi Sync, you agree to be bound by these Terms of Service. If you do not agree to these terms, do not install or use the software.
 
 ---
 
 ## 2. License Grant & Open Source Rights
 
-ClipSync is licensed under the **MIT License**:
+WiFi Sync is licensed under the **MIT License**:
 
 ```text
 MIT License
@@ -61,7 +61,7 @@ Under no circumstances shall the developer (Muhammad Abu Huraira) or contributor
 ## 6. Permitted & Prohibited Use
 
 - **Permitted:** Personal, educational, and commercial productivity use across devices owned or legally authorized by the user.
-- **Prohibited:** Utilizing ClipSync for unauthorized monitoring, surreptitious surveillance, unlicensed remote access to third-party devices, or any activity violating local or international computer crime laws.
+- **Prohibited:** Utilizing WiFi Sync for unauthorized monitoring, surreptitious surveillance, unlicensed remote access to third-party devices, or any activity violating local or international computer crime laws.
 
 ---
 

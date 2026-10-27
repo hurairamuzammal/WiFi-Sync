@@ -1,4 +1,4 @@
-name: Build and Release ClipSync Multi-Platform
+name: Build and Release WiFi Sync Multi-Platform
 
 on:
   push:
@@ -41,13 +41,13 @@ jobs:
       - name: Rename APK Asset
         run: |
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-release.apk dist/ClipSync-android.apk
+          cp build/app/outputs/flutter-apk/app-release.apk dist/WiFiSync-android.apk
 
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ClipSync-android
-          path: dist/ClipSync-android.apk
+          name: WiFiSync-android
+          path: dist/WiFiSync-android.apk
 
   # -------------------------------------------------------------
   # Job 2: Build Linux x64 Release Bundle
@@ -79,13 +79,13 @@ jobs:
       - name: Package Linux Bundle
         run: |
           mkdir -p dist
-          tar -czvf dist/ClipSync-linux-x64.tar.gz -C build/linux/x64/release/bundle .
+          tar -czvf dist/WiFiSync-linux-x64.tar.gz -C build/linux/x64/release/bundle .
 
       - name: Upload Linux Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ClipSync-linux-x64
-          path: dist/ClipSync-linux-x64.tar.gz
+          name: WiFiSync-linux-x64
+          path: dist/WiFiSync-linux-x64.tar.gz
 
   # -------------------------------------------------------------
   # Job 3: Build Windows x64 Release
@@ -116,13 +116,13 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist
-          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath dist\ClipSync-windows-x64.zip
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath dist\WiFiSync-windows-x64.zip
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ClipSync-windows-x64
-          path: dist\ClipSync-windows-x64.zip
+          name: WiFiSync-windows-x64
+          path: dist\WiFiSync-windows-x64.zip
 
   # -------------------------------------------------------------
   # Job 4: Publish to GitHub Release
@@ -139,19 +139,19 @@ jobs:
       - name: Download Android Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ClipSync-android
+          name: WiFiSync-android
           path: release-assets
 
       - name: Download Linux Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ClipSync-linux-x64
+          name: WiFiSync-linux-x64
           path: release-assets
 
       - name: Download Windows Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ClipSync-windows-x64
+          name: WiFiSync-windows-x64
           path: release-assets
 
       - name: Publish GitHub Release

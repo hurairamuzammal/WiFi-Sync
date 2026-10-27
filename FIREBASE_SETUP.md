@@ -1,13 +1,13 @@
 # 100% Free Firebase Setup Guide (3 Minutes)
 
-ClipSync operates on a bring-your-own-cloud model. You can set up your own free Firebase project in about 3 minutes without entering any credit card information.
+WiFi Sync operates on a bring-your-own-cloud model. You can set up your own free Firebase project in about 3 minutes without entering any credit card information.
 
 ---
 
 ### Step 1: Create a Free Firebase Project
 1. Open the [Firebase Console](https://console.firebase.google.com).
 2. Click **Add project** (or **Create a project**).
-3. Name your project (e.g., `my-clipsync-hub`).
+3. Name your project (e.g., `my-wifisync-hub`).
 4. (Optional) Disable Google Analytics if you prefer maximum privacy.
 5. Click **Create project** and wait 15 seconds.
 
@@ -28,20 +28,20 @@ ClipSync operates on a bring-your-own-cloud model. You can set up your own free 
 3. Choose your nearest database location (e.g., `United States (us-central1)`).
 4. For security rules, select **Start in test mode** (or import the hardened `database.rules.json` file provided in the repository root).
 5. Click **Enable**.
-6. Copy your Database URL (looks like `https://my-clipsync-hub-default-rtdb.firebaseio.com`).
+6. Copy your Database URL (looks like `https://my-wifisync-hub-default-rtdb.firebaseio.com`).
 
 ---
 
 ### Step 4: Get Your Project ID and Web API Key
 1. Click the **Gear icon (Project settings)** in the top-left sidebar.
 2. Under the **General** tab:
-   - Find your **Project ID** (e.g. `my-clipsync-hub-12345`).
+   - Find your **Project ID** (e.g. `my-wifisync-hub-12345`).
    - Find your **Web API Key** (starts with `AIzaSy...`).
 
 ---
 
-### Step 5: Connect in ClipSync
-Open the ClipSync application on any device:
+### Step 5: Connect in WiFi Sync
+Open the WiFi Sync application on any device:
 1. On the Sign-In screen, tap **Connect** on the top cloud strip (or go to **Settings > Cloud Backend > Configure**).
 2. Enter your:
    - **Firebase Project ID**
