@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-/// Minimal monochrome WiFi brand icon for WiFi Sync.
-/// Sleek obsidian squircle (#18181B) with crisp pure white WiFi arcs
-/// and central broadcast dot, designed for pixel-perfect scaling across all sizes.
+/// Minimal flat Nordic-pastel brand icon for WiFi Sync.
+/// Combines the signature pastel clipboard card on the left with a clean
+/// WiFi broadcast symbol next to it on the right:
+/// soft pastel lavender squircle (#EBE7F8), clean white clipboard card,
+/// muted slate-plum (#463E66) refined strokes, and soft pastel mint (#A6E1C8) accents.
 class BrandLogoIcon extends StatelessWidget {
   final double size;
   final bool showBadge;
@@ -16,76 +18,121 @@ class BrandLogoIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = size * 0.22;
+    final radius = size * 0.24;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: const Color(0xFF18181B),
+        color: const Color(0xFFEBE7F8),
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: const Color(0xFF3F3F46),
-          width: (size * 0.02).clamp(1.0, 2.0),
+          color: const Color(0xFFDDD7F0),
+          width: 1.0,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x2E000000),
-            blurRadius: size * 0.1,
-            offset: Offset(0, size * 0.04),
-          ),
-        ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: CustomPaint(
-          painter: _MonochromeWiFiPainter(showBadge: showBadge),
-        ),
+      child: CustomPaint(
+        painter: _PastelClipboardWithWiFiPainter(showBadge: showBadge),
       ),
     );
   }
 }
 
-class _MonochromeWiFiPainter extends CustomPainter {
+class _PastelClipboardWithWiFiPainter extends CustomPainter {
   final bool showBadge;
 
-  const _MonochromeWiFiPainter({this.showBadge = false});
+  const _PastelClipboardWithWiFiPainter({this.showBadge = false});
 
   @override
   void paint(Canvas canvas, Size size) {
     final s = size.width;
-    final cx = s / 2.0;
-    final cy = s * 0.65;
 
-    final strokeW = (s * 0.065).clamp(1.8, 6.5);
-    final dotR = (s * 0.068).clamp(2.0, 6.8);
+    const inkPlum = Color(0xFF463E66);
+    const pastelMint = Color(0xFFA6E1C8);
+    const pastelIris = Color(0xFFC4BCEA);
 
-    // Center broadcast dot
-    final dotPaint = Paint()
-      ..color = showBadge ? const Color(0xFF34C77B) : Colors.white
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(cx, cy), dotR, dotPaint);
+    final strokeW = (s * 0.026).clamp(1.5, 5.0);
 
-    // WiFi waves (pure monochrome white)
-    final wavePaint = Paint()
-      ..color = Colors.white
+    final strokePaint = Paint()
+      ..color = inkPlum
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeW
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    // Symmetric 86 degree sweep centered around vertical top (-pi / 2)
-    const sweepAngle = 86.0 * math.pi / 180.0;
-    final startAngle = -math.pi / 2.0 - (sweepAngle / 2.0);
+    final fillWhite = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
 
-    final radii = [s * 0.18, s * 0.31, s * 0.44];
+    // 1. Clipboard Card (left side)
+    final boardW = s * 0.36;
+    final boardH = s * 0.49;
+    final boardR = s * 0.075;
+    final bx0 = s * 0.13;
+    final by0 = s * 0.27;
 
-    for (final r in radii) {
-      final rect = Rect.fromCircle(center: Offset(cx, cy), radius: r);
-      canvas.drawArc(rect, startAngle, sweepAngle, false, wavePaint);
+    final boardRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(bx0, by0, boardW, boardH),
+      Radius.circular(boardR),
+    );
+    canvas.drawRRect(boardRect, fillWhite);
+    canvas.drawRRect(boardRect, strokePaint);
+
+    // Top pastel-mint clip pill
+    final clipW = boardW * 0.48;
+    final clipH = boardH * 0.18;
+    final cxBoard = bx0 + boardW / 2;
+    final clipRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(cxBoard - clipW / 2, by0 - clipH * 0.45, clipW, clipH),
+      Radius.circular(clipH / 2),
+    );
+    canvas.drawRRect(clipRect, Paint()..color = pastelMint);
+    canvas.drawRRect(clipRect, strokePaint);
+
+    // Horizontal pastel lines inside card
+    final padX = boardW * 0.20;
+    final lineH = (s * 0.034).clamp(1.5, 6.5);
+    final lx0 = bx0 + padX;
+    final lx1 = bx0 + boardW - padX;
+
+    final ly1 = by0 + boardH * 0.44;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(lx0, ly1, lx1 - lx0, lineH),
+        Radius.circular(lineH / 2),
+      ),
+      Paint()..color = pastelIris,
+    );
+
+    final ly2 = by0 + boardH * 0.64;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(lx0, ly2, (lx1 - lx0) * 0.55, lineH),
+        Radius.circular(lineH / 2),
+      ),
+      Paint()..color = pastelMint,
+    );
+
+    // 2. WiFi indicator next to clipboard (right side)
+    final wifiCx = s * 0.73;
+    final wifiCy = s * 0.64;
+    final dotR = (s * 0.038).clamp(2.0, 6.0);
+
+    // Center broadcast dot
+    final dotColor = showBadge ? const Color(0xFF34C77B) : inkPlum;
+    canvas.drawCircle(Offset(wifiCx, wifiCy), dotR, Paint()..color = dotColor);
+
+    // Arcs radiating upward (start -135°, sweep 90°)
+    const startAngle = -3.0 * math.pi / 4.0;
+    const sweepAngle = math.pi / 2.0;
+
+    final radii = [s * 0.09, s * 0.17, s * 0.25];
+    for (final rad in radii) {
+      final rect = Rect.fromCircle(center: Offset(wifiCx, wifiCy), radius: rad);
+      canvas.drawArc(rect, startAngle, sweepAngle, false, strokePaint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _MonochromeWiFiPainter oldDelegate) =>
+  bool shouldRepaint(covariant _PastelClipboardWithWiFiPainter oldDelegate) =>
       oldDelegate.showBadge != showBadge;
 }
